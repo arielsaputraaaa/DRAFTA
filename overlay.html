@@ -13,7 +13,7 @@
 #area{position:absolute;left:40px;right:40px;top:30px;bottom:360px;display:flex;flex-direction:column}
 #g{flex:1;display:flex;gap:var(--gp,24px);min-height:0}.col{display:flex;flex-direction:column;gap:var(--gp,24px);min-width:0}.bx{flex:1;min-height:0;cursor:pointer}
 .bx{position:relative;overflow:hidden;background:var(--pn);border:2px solid var(--bd);box-shadow:0 0 0 4px #0008,0 10px 40px #000a}
-.m{position:absolute;inset:0;width:100%;height:100%}.ph{display:flex;align-items:center;justify-content:center;color:var(--ac);font:700 26px Lato;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px}
+.m{position:absolute;inset:0;width:100%;height:100%}.ph{display:flex;align-items:center;justify-content:center;color:var(--ac);font:700 26px Lato;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px 20px 150px}
 .cp{position:absolute;left:0;right:0;bottom:0;padding:70px 24px 18px;text-align:center;background:linear-gradient(transparent,#000e);overflow:hidden}
 .t1{font:700 54px/1.1 Oswald;text-transform:uppercase;letter-spacing:1px;text-shadow:0 2px 8px #000}
 .t2{font:700 28px Oswald;letter-spacing:3px;color:#f2c94c;text-transform:uppercase;margin-top:4px}
@@ -58,7 +58,7 @@ async function bgR(){const bg=$('#bg'),B=S.bg,s=JSON.stringify(B);if(bg.dataset.
  if(B.t=='anim')bg.className='a-'+B.an;else if(B.t=='color')bg.style.background=B.c1;
  else if(B.t=='media'&&B.key){const f=await get(B.key);if(f&&bg.dataset.s===s){const m=document.createElement(B.mt=='video'?'video':'img');m.src=URL.createObjectURL(f);if(B.mt=='video')m.autoplay=m.loop=m.muted=true;bg.append(m)}}}
 function render(){const r=document.documentElement.style,t=S.th;r.setProperty('--ac',t.ac);r.setProperty('--bd',t.bd);r.setProperty('--pn',t.pn);r.setProperty('--c1',S.bg.c1);r.setProperty('--c2',S.bg.c2);r.setProperty('--tc',S.tm.col);bgR();
- const A=S.ar,ar=$('#area');ar.style.left=A.l+'px';ar.style.right=A.r+'px';ar.style.top=A.t+'px';ar.style.bottom=(330+A.b)+'px';ar.style.setProperty('--gp',A.g+'px');
+ const A=S.ar,ar=$('#area');ar.style.left=A.l+'px';ar.style.right=A.r+'px';const TH={badge:82,neon:90,digital:76,pill:82,slant:82,flip:80,minimal:98,bar:100,ring:200}[S.tm.style]||82,tb=S.tm.on&&S.tm.push?6+TH*(S.tm.sz||100)/100+10:0;ar.style.top=Math.max(A.t,tb)+'px';ar.style.bottom=(370+A.b)+'px';ar.style.setProperty('--gp',A.g+'px');
  $('#cl').style.flex=S.wl;$('#cr').style.flex=100-S.wl;
  for(let i=0;i<6;i++){const col=$(i<3?'#cl':'#cr'),vis=i<3?i<S.nl:i-3<S.nr;let el=EL[i];
   if(!el){el=EL[i]=document.createElement('div');el.className='bx';el.innerHTML='<div class="cp"></div>';el.onclick=()=>click(i);col.append(el)}
