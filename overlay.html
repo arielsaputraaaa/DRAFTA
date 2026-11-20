@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Overlay Gabungan</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Lato:wght@700&family=Inter:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Orbitron:wght@700&family=Lato:wght@700&family=Inter:wght@800&display=swap" rel="stylesheet">
 <style>
 :root{--ac:#f5c06f;--bd:#d4ab4c;--pn:#111827;--c1:#0b2a66;--c2:#10204a;--tc:#f5c06f}
 *{box-sizing:border-box;margin:0}html,body{height:100%;overflow:hidden;background:transparent;font-family:Lato,Arial,sans-serif;color:#fff}
@@ -10,8 +10,8 @@
 .a-gradient{background:linear-gradient(120deg,var(--c1),var(--c2),var(--c1));background-size:300% 300%;animation:gs 12s ease infinite}@keyframes gs{50%{background-position:100% 50%}}
 .a-pulse{background:radial-gradient(circle,var(--c2),var(--c1) 70%);animation:pu 4s ease-in-out infinite alternate}@keyframes pu{to{filter:brightness(1.6) saturate(1.3)}}
 .a-grid{background:linear-gradient(var(--c1),var(--c2))}.a-grid:before{content:"";position:absolute;inset:0;background:linear-gradient(#fff2 1px,transparent 1px),linear-gradient(90deg,#fff2 1px,transparent 1px);background-size:60px 60px;animation:gm 4s linear infinite}@keyframes gm{to{background-position:60px 60px}}
-#area{position:absolute;left:40px;top:30px;width:1840px;height:690px;display:flex;flex-direction:column}
-#g{flex:1;display:flex;gap:24px;min-height:0}.col{display:flex;flex-direction:column;gap:24px;min-width:0}.bx{flex:1;min-height:0;cursor:pointer}
+#area{position:absolute;left:40px;right:40px;top:30px;bottom:360px;display:flex;flex-direction:column}
+#g{flex:1;display:flex;gap:var(--gp,24px);min-height:0}.col{display:flex;flex-direction:column;gap:var(--gp,24px);min-width:0}.bx{flex:1;min-height:0;cursor:pointer}
 .bx{position:relative;overflow:hidden;background:var(--pn);border:2px solid var(--bd);box-shadow:0 0 0 4px #0008,0 10px 40px #000a}
 .m{position:absolute;inset:0;width:100%;height:100%}.ph{display:flex;align-items:center;justify-content:center;color:var(--ac);font:700 26px Lato;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px}
 .cp{position:absolute;left:0;right:0;bottom:0;padding:70px 24px 18px;text-align:center;background:linear-gradient(transparent,#000e);overflow:hidden}
@@ -26,15 +26,26 @@
 #cm .b{flex:1;background:var(--ac);color:#111;font:800 30px/1 Inter;overflow:hidden;display:flex;align-items:center;white-space:nowrap}
 #tmr{position:absolute;top:6px;min-width:190px;padding:4px 22px 6px;text-align:center;background:var(--pn);border:2px solid var(--bd);box-shadow:0 6px 20px #000a;display:none;z-index:5}
 #tmr small{display:block;font:700 15px Oswald;letter-spacing:4px;color:var(--ac)}#tmr b{font:700 58px/1 Oswald;color:var(--tc)}#tmr.low b{color:#ff4a4a;animation:bl .5s infinite alternate}@keyframes bl{to{opacity:.3}}
+#tmr i{font-style:normal}#tmr svg,#tmr .pb{display:none}
+#tmr.s-neon,#tmr.s-flip,#tmr.s-minimal{background:none;border:0;box-shadow:none}
+#tmr.s-neon b{font-size:78px;text-shadow:0 0 10px var(--tc),0 0 34px var(--tc)}#tmr.s-neon small{text-shadow:0 0 10px var(--ac)}
+#tmr.s-minimal b{font-size:84px;text-shadow:0 4px 18px #000,0 0 3px #000}#tmr.s-minimal small{text-shadow:0 2px 6px #000}
+#tmr.s-digital{background:#04070d;border:2px solid #fff3;border-radius:8px;box-shadow:inset 0 0 24px #000,0 6px 20px #000a}#tmr.s-digital b{font:700 50px/1 Orbitron,Oswald;letter-spacing:4px;text-shadow:0 0 16px var(--tc)}#tmr.s-digital small{color:#9fb0cf}
+#tmr.s-pill{background:var(--tc);border:0;border-radius:70px;padding:4px 40px 6px}#tmr.s-pill b{color:#111}#tmr.s-pill small{color:#111b}
+#tmr.s-slant{background:var(--bd);border:0;padding:4px 56px 6px;clip-path:polygon(12% 0,100% 0,88% 100%,0 100%);box-shadow:none}#tmr.s-slant b{color:#111}#tmr.s-slant small{color:#111b}
+#tmr.s-flip b{display:flex;gap:6px;justify-content:center}#tmr.s-flip b i{background:linear-gradient(#1c263b 50%,#0d1423 50%);border:1px solid #fff2;border-radius:8px;padding:6px 12px;min-width:50px;box-shadow:0 6px 16px #000a}#tmr.s-flip b i.c{min-width:0;padding:6px 1px;background:none;border:0;box-shadow:none}#tmr.s-flip small{text-shadow:0 2px 6px #000}
+#tmr.s-bar{min-width:280px;padding-bottom:12px}#tmr.s-bar .pb{display:block;height:8px;background:#fff2;margin-top:6px}#tmr.s-bar .pb u{display:block;height:100%;width:calc(var(--p,0)*100%);background:var(--tc)}
+#tmr.s-ring{width:200px;height:200px;min-width:0;padding:0;border-radius:50%}#tmr.s-ring svg{display:block;position:absolute;inset:6px;width:188px;height:188px;transform:rotate(-90deg)}#tmr.s-ring .tk{fill:none;stroke:#fff2;stroke-width:6}#tmr.s-ring .pg{fill:none;stroke:var(--tc);stroke-width:6;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:calc(289 - 289*var(--p,0))}
+#tmr.s-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:50px}#tmr.s-ring small{position:absolute;top:44px;left:0;right:0}
 .p-tl{left:40px}.p-tc{left:50%;transform:translateX(-50%)}.p-tr{right:40px}
-iframe{position:absolute;inset:0;width:1920px;height:1080px;border:0;background:transparent;pointer-events:none}
+iframe{position:absolute;inset:0;width:1920px;height:100%;border:0;background:transparent;pointer-events:none}
 </style></head><body>
 <div id="stage"><div id="bg"></div><div id="area"><div id="g"><div class="col" id="cl"></div><div class="col" id="cr"></div></div><div id="cm"><div class="h"><i></i><span>Audience Comment</span><span style="opacity:.5">|</span><span id="cu"></span></div><div class="b"><span id="ct"></span></div></div></div>
-<div id="tmr"><small></small><b>0:00</b></div><iframe src="index.html"></iframe></div>
+<div id="tmr"><small></small><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="46"/><circle class="pg" cx="50" cy="50" r="46"/></svg><b>0:00</b><div class="pb"><u></u></div></div><iframe src="index.html"></iframe></div>
 <script src="common.js"></script><script>
 let S=loadS();const $=(s,e=document)=>e.querySelector(s),str={},sig={},EL=[],AN={fade:'fd',up:'up',left:'lf',zoom:'zm',type:'ty',glow:'gl'};
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-function fit(){$('#stage').style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`}addEventListener('resize',fit);fit();
+function fit(){const k=innerWidth/1920;$('#stage').style.height=innerHeight/k+'px';$('#stage').style.transform=`scale(${k})`}addEventListener('resize',fit);fit();
 async function cap(i){try{const s=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});str[i]=s;s.getVideoTracks()[0].onended=()=>{delete str[i];render()};render()}catch(e){}}
 function click(i){const b=S.boxes[i];if(b.type=='cap'){str[i]||cap(i);return}if(b.type!='none'&&b.key)return;const f=document.createElement('input');f.type='file';f.accept='image/*,video/*';f.onchange=async()=>{const x=f.files[0];if(!x)return;const k='f'+Date.now();await put(k,x);b.key=k;b.type=x.type.startsWith('video')?'video':'img';saveS(S);render()};f.click()}
 async function media(i,b,el,s){let m;
@@ -47,16 +58,22 @@ async function bgR(){const bg=$('#bg'),B=S.bg,s=JSON.stringify(B);if(bg.dataset.
  if(B.t=='anim')bg.className='a-'+B.an;else if(B.t=='color')bg.style.background=B.c1;
  else if(B.t=='media'&&B.key){const f=await get(B.key);if(f&&bg.dataset.s===s){const m=document.createElement(B.mt=='video'?'video':'img');m.src=URL.createObjectURL(f);if(B.mt=='video')m.autoplay=m.loop=m.muted=true;bg.append(m)}}}
 function render(){const r=document.documentElement.style,t=S.th;r.setProperty('--ac',t.ac);r.setProperty('--bd',t.bd);r.setProperty('--pn',t.pn);r.setProperty('--c1',S.bg.c1);r.setProperty('--c2',S.bg.c2);r.setProperty('--tc',S.tm.col);bgR();
+ const A=S.ar,ar=$('#area');ar.style.left=A.l+'px';ar.style.right=A.r+'px';ar.style.top=A.t+'px';ar.style.bottom=(330+A.b)+'px';ar.style.setProperty('--gp',A.g+'px');
  $('#cl').style.flex=S.wl;$('#cr').style.flex=100-S.wl;
  for(let i=0;i<6;i++){const col=$(i<3?'#cl':'#cr'),vis=i<3?i<S.nl:i-3<S.nr;let el=EL[i];
   if(!el){el=EL[i]=document.createElement('div');el.className='bx';el.innerHTML='<div class="cp"></div>';el.onclick=()=>click(i);col.append(el)}
   el.style.display=vis?'':'none';if(!vis){delete sig[i];continue}
-  const b=S.boxes[i],s=[b.type,b.key,b.fit,b.snd,!!str[i]].join('|');if(sig[i]!==s){sig[i]=s;media(i,b,el,s)}
+  const b=S.boxes[i];el.style.flex=b.h||1;const s=[b.type,b.key,b.fit,b.snd,!!str[i]].join('|');if(sig[i]!==s){sig[i]=s;media(i,b,el,s)}
   const cp=$('.cp',el),cs=[b.title,b.sub,b.anim,S.ts,S.rp].join('|');
   if(cp.dataset.s!==cs){cp.dataset.s=cs;cp.className='cp '+b.anim;cp.style.setProperty('--an',AN[b.anim]||'none');cp.style.display=b.title||b.sub?'':'none';
    const w=x=>b.anim=='marquee'?`<span style="animation-duration:${S.ts}s">${esc(x)}</span>`:esc(x);
    cp.innerHTML=(b.title?`<div class="t t1${b.anim=='marquee'?' mq':''}">${w(b.title)}</div>`:'')+(b.sub?`<div class="t t2${b.anim=='marquee'?' mq':''}">${w(b.sub)}</div>`:'')}}
  const c=S.cm,cm=$('#cm');cm.style.display=c.on?'flex':'none';$('#cu').textContent=c.user;$('#ct').textContent=c.text;$('#ct').style.animationDuration=c.sp+'s';$('#g').style.marginBottom=0;tick()}
-function tick(){const T=S.tm,e=$('#tmr'),l=T.run?Math.max(0,Math.ceil((T.end-Date.now())/1000)):T.left;e.style.display=T.on?'block':'none';e.className='p-'+T.pos+(T.run&&l<=10?' low':'');$('small',e).textContent=T.label;$('b',e).textContent=Math.floor(l/60)+':'+String(l%60).padStart(2,'0')}
-render();setInterval(tick,200);ch&&(ch.onmessage=e=>{S=e.data;render()});addEventListener('storage',e=>{if(e.key==KEY){S=loadS();render()}});
+function tick(){const T=S.tm,e=$('#tmr'),n=Date.now(),v=T.mode=='up'?T.left+(T.run?(n-T.st)/1000:0):(T.run?Math.max(0,(T.end-n)/1000):T.left);
+ const sec=T.ds||T.mode=='up'?Math.floor(v):Math.ceil(v),h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60,p2=x=>String(x).padStart(2,'0');
+ let tx=(h?h+':'+p2(m):m)+':'+p2(s);if(T.ds)tx+='.'+Math.floor(v*10)%10;
+ const low=T.mode!='up'&&T.run&&v<=10;e.style.display=T.on?'block':'none';e.style.zoom=(T.sz||100)/100;
+ e.className='p-'+T.pos+' s-'+(T.style||'badge')+(low?' low':'');e.style.setProperty('--p',T.mode=='up'?(v%60)/60:Math.min(1,v/(T.dur||1)));
+ $('small',e).textContent=T.label;const b=$('b',e);if(b.dataset.t!==tx){b.dataset.t=tx;b.innerHTML=[...tx].map(c=>`<i${c==':'||c=='.'?' class="c"':''}>${c}</i>`).join('')}}
+render();setInterval(tick,100);ch&&(ch.onmessage=e=>{S=e.data;render()});addEventListener('storage',e=>{if(e.key==KEY){S=loadS();render()}});
 </script></body></html>

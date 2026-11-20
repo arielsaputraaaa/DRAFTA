@@ -4,7 +4,7 @@
 :root{--g1:#fff;--g2:#9fb3c8;--g3:#3b4a5e}
 *{box-sizing:border-box;margin:0}html,body{height:100%;overflow:hidden;background:transparent;font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;color:#fff}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
-#bar{position:absolute;left:0;top:750px;width:1920px;height:330px;display:flex;background:#070b14;box-shadow:0 -10px 40px #000a;animation:up .9s cubic-bezier(.2,.9,.2,1) both}
+#bar{position:absolute;left:0;bottom:0;width:1920px;height:330px;display:flex;background:#070b14;box-shadow:0 -10px 40px #000a;animation:up .9s cubic-bezier(.2,.9,.2,1) both}
 @keyframes up{from{transform:translateY(100%)}}
 .side{width:750px;display:flex;flex-direction:column;--c:#1f5fd6;--cd:#0b2a66;--cm:#154a9f}
 .top{height:80px;display:flex;background:#12161f}#B .top{flex-direction:row-reverse}
@@ -96,7 +96,7 @@ const syn={pick(){noise(0,.8,300,3500,.5);tone(110,.7,.8,"sine",1,40);tone(523,.
 const files={};["pick","ban","warn","end"].forEach(n=>{const ex=[".mp3",".wav",".ogg"];(function t(i){if(i>=ex.length)return;const a=new Audio("sound/"+n+ex[i]);a.preload="auto";a.addEventListener("canplaythrough",()=>files[n]=a.src,{once:true});a.addEventListener("error",()=>t(i+1),{once:true});a.load()})(0)});
 function play(n){if(!S.snd.on)return;if(files[n]){const a=new Audio(files[n]);a.volume=S.snd.vol;a.play().catch(()=>{})}else syn[n]()}
 const sfx={pick:()=>play("pick"),ban:()=>play("ban"),warn:()=>play("warn"),end:()=>play("end")};
-function fit(){$("#stage").style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`}addEventListener("resize",fit);fit();
+function fit(){const k=innerWidth/1920,s=$("#stage").style;s.height=innerHeight/k+"px";s.transform=`scale(${k})`}addEventListener("resize",fit);fit();
 const prev={A:{pk:[],bn:[]},B:{pk:[],bn:[]}};
 function build(id){const hs='<svg class="hs" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10v6a3 3 0 0 0 3 3h2v-8H5v-1a7 7 0 0 1 14 0v1h-2v8h2a3 3 0 0 0 3-3v-6A10 10 0 0 0 12 2z"/></svg>';
  $("#"+id).innerHTML=`<div class="top"><div class="tm">${hs}<img class="ava"><div class="nb"><b class="tn"></b><i class="sb"></i></div></div><div class="bans">${'<div class="b"><img class="hp"><img class="x" src="Ban.png"></div>'.repeat(5)}</div></div><div class="pks">${'<div class="s idle"><div class="art"><img class="lg"><div class="hn"><span></span></div></div></div>'.repeat(5)}</div><div class="pn">${"<div></div>".repeat(5)}</div>`}

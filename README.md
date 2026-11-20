@@ -32,3 +32,9 @@ Overlay turnamen MLBB: **bar draft pick/ban** di bawah dan **panggung konten** (
 - Capture layar hanya tampil di halaman tempat capture dimulai. Di OBS, pakai Window Capture bawaan OBS.
 - Gambar hero baru: `HeroPick/<nama>.png` dan `HeroBan/<nama>.png` (huruf kecil).
 - Suara kustom (opsional): taruh `pick.mp3`, `ban.mp3`, `warn.mp3`, `end.mp3` di folder `sound/`.
+
+## Timer / Stopwatch panggung
+Di tab Panggung: pilih mode **Timer mundur** atau **Stopwatch (maju)**, 9 model tampilan, ukuran, posisi, warna, dan opsi 0,1 detik.
+
+## Ukuran kotak
+Tab Panggung → **Ukuran & Posisi Kotak**: margin kiri/kanan/atas, jarak ke bar draft, jarak antar kotak, lebar kolom kiri, dan tinggi relatif tiap kotak. Bar draft pick selalu menempel di bawah layar berapa pun ukuran jendelanya.

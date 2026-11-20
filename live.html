@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Live Output (Lobby + Draft)</title>
-<style>*{margin:0}html,body{height:100%;overflow:hidden;background:transparent}#st{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}.sc{position:absolute;inset:0;display:none}.sc iframe{width:1920px;height:1080px;border:0;background:transparent}</style></head><body>
+<style>*{margin:0}html,body{height:100%;overflow:hidden;background:transparent}#st{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}.sc{position:absolute;inset:0;display:none}.sc iframe{width:1920px;height:100%;border:0;background:transparent}</style></head><body>
 <div id="st"><div class="sc" id="s-lobby"><iframe src="lobby.html?view"></iframe></div><div class="sc" id="s-draft"><iframe src="overlay.html"></iframe></div></div>
 <script src="common.js"></script><script>
 let S=loadS(),cur=null;const $=s=>document.querySelector(s);
@@ -9,7 +9,7 @@ const E='cubic-bezier(.7,0,.2,1)',TR={fade:[[{opacity:0},{opacity:1}],[{opacity:
  slideu:[[{transform:'translateY(100%)'},{transform:'none'}],[{transform:'none'},{transform:'translateY(-100%)'}]],
  zoom:[[{opacity:0,transform:'scale(1.25)'},{opacity:1,transform:'none'}],[{opacity:1,transform:'none'},{opacity:0,transform:'scale(.8)'}]],
  wipe:[[{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0 0 0)'}],[{opacity:1},{opacity:1}]]};
-function fit(){$('#st').style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`}addEventListener('resize',fit);fit();
+function fit(){const k=innerWidth/1920;$('#st').style.height=innerHeight/k+'px';$('#st').style.transform=`scale(${k})`}addEventListener('resize',fit);fit();
 function go(){const n=S.sc.cur,b=$('#s-'+n),a=$('#s-'+(n=='lobby'?'draft':'lobby'));
  if(cur===null){cur=n;b.style.display='block';return}if(n===cur)return;cur=n;
  [a,b].forEach(e=>e.getAnimations().forEach(x=>x.cancel()));const[i,o]=TR[S.sc.tr]||TR.fade,d=S.sc.dur||900;
