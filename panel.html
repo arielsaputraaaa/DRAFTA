@@ -10,11 +10,11 @@ main{display:flex;gap:16px;padding:16px;align-items:flex-start}#L{flex:1;min-wid
 fieldset{border:1px solid var(--bd);background:var(--pn);margin:0 0 14px;padding:12px}legend{padding:0 8px;font:700 16px Oswald;letter-spacing:1px;color:var(--ac);text-transform:uppercase}
 .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}label{display:block;font-size:12px;color:#9fb0cf}label.ck{display:flex;gap:6px;align-items:center;color:#e8edf7;padding-top:18px}
 input,select{width:100%;padding:7px;margin-top:3px;background:#0b1020;color:#fff;border:1px solid #fff3}input[type=checkbox]{width:auto;margin:0}input[type=color]{height:34px;padding:2px}
-.ds{grid-column:1/-1;font-size:12px;color:#f2c94c;background:#0006;padding:6px 8px;border-left:3px solid var(--ac)}iframe#dr{width:100%;height:calc(100vh - 70px);border:0;background:#161820}
+.ds{grid-column:1/-1;font-size:12px;color:#f2c94c;background:#0006;padding:6px 8px;border-left:3px solid var(--ac)}iframe#dr,iframe#lbf{width:100%;height:calc(100vh - 70px);border:0;background:#161820}
 .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.hint{font-size:12px;color:#9fb0cf;margin-top:6px}
-</style></head><body>
-<header><h1>Panel Kontrol — Draft + Panggung</h1><button data-v="st" class="on">Panggung (Atas)</button><button data-v="dr">Draft Pick (Bawah)</button><a class="btn pri" href="overlay.html" target="_blank">Buka Overlay ↗</a></header>
-<main><div id="L"></div><div id="R"><div id="pv"><iframe id="ov" src="overlay.html" allow="display-capture"></iframe></div><p class="hint">Preview langsung (hasil akhir 1920×1080). Untuk OBS pakai Browser Source ke <b>overlay.html</b>.</p></div></main>
+.scb{display:flex;gap:8px}.scb button{flex:1;padding:14px 6px;font:700 18px Oswald;letter-spacing:2px;text-transform:uppercase}.scb button.on{box-shadow:0 0 0 3px #0008,0 0 18px var(--ac)}iframe#lbf{height:calc(100vh - 190px)}</style></head><body>
+<header><h1>Panel Kontrol — Draft + Panggung</h1><button data-v="st" class="on">Panggung (Atas)</button><button data-v="dr">Draft Pick (Bawah)</button><button data-v="lb">Lobby Esports</button><a class="btn pri" href="live.html" target="_blank">Buka Output Live ↗</a></header>
+<main><div id="L"></div><div id="R"><fieldset id="scf"><legend>Pindah Scene</legend><div id="scn"></div></fieldset><div id="pv"><iframe id="ov" src="live.html" allow="display-capture"></iframe></div><p class="hint">Preview langsung (1920×1080). Untuk OBS pakai Browser Source ke <b>live.html</b>.</p></div></main>
 <script src="common.js"></script><script>
 let S=loadS(),V='st';const $=(s,e=document)=>e.querySelector(s),sv=()=>saveS(S);
 const g=p=>p.split('.').reduce((o,k)=>o[k],S),sp=(p,v)=>{const a=p.split('.');let o=S;a.slice(0,-1).forEach(k=>o=o[k]);o[a.pop()]=v};
@@ -38,8 +38,11 @@ ${ids.map(boxUI).join('')}
 <div class="row"><button class="pri" data-t="start">▶ Start</button><button data-t="stop">⏸ Stop</button><button data-t="reset">⟲ Reset</button><button data-d="30">0:30</button><button data-d="60">1:00</button><button data-d="300">5:00</button><button data-d="600">10:00</button></div></fieldset>
 <fieldset><legend>Background</legend><div class="gr">${sel('bg.t','Jenis',{none:'Transparan (untuk OBS)',color:'Warna solid',anim:'Animasi',media:'Upload gambar / video'})}${S.bg.t=='anim'?sel('bg.an','Animasi',{aurora:'Aurora bergerak',gradient:'Gradasi bergeser',pulse:'Berdenyut',grid:'Grid berjalan'}):''}${S.bg.t=='media'?`<label>Upload background<input type="file" accept="image/*,video/*" data-bgup="1"></label>`:''}${inp('bg.c1','Warna 1','color')}${S.bg.t=='anim'?inp('bg.c2','Warna 2','color'):''}</div></fieldset>
 <fieldset><legend>Warna Bingkai</legend><div class="gr">${inp('th.ac','Aksen / bar komentar','color')}${inp('th.bd','Garis bingkai','color')}${inp('th.pn','Panel gelap','color')}</div><div class="row"><button data-th='{"ac":"#f5c06f","bd":"#d4ab4c","pn":"#111827"}'>Preset Emas–Navy (referensi)</button><button data-th='{"ac":"#ff3b3b","bd":"#e32b2b","pn":"#1a0d10"}'>Preset Merah</button></div></fieldset>`}
+const LC=new BroadcastChannel('lobby3');
+const lbUI=()=>`<fieldset><legend>Timer Lobby (tampil di scene Lobby)</legend><div class="row"><button class="pri" data-lc="start">▶ Mulai</button><button data-lc="pause">⏸ Jeda</button><button data-lc="reset">⟲ Reset</button></div><p class="hint">Editor lengkap di bawah (tab Timer, Panelis, Media, Teks). Semua perubahan langsung tampil di preview dan di output live.</p></fieldset><iframe id="lbf" src="lobby.html?edit"></iframe>`;
+function scDraw(){const c=S.sc,L=c.cur=='lobby';$('#scn').innerHTML=`<div class="scb"><button data-go="lobby" class="${L?'on pri':''}">Lobby${L?' ● LIVE':''}</button><button data-go="draft" class="${L?'':'on pri'}">Draft${L?'':' ● LIVE'}</button></div><div class="gr" style="margin-top:8px">${sel('sc.tr','Animasi perpindahan',{fade:'Fade',slidel:'Geser ke kiri',slider:'Geser ke kanan',slideu:'Geser ke atas',zoom:'Zoom',wipe:'Wipe'})}${inp('sc.dur','Durasi (ms)','number','min=200 step=100')}</div>`}
 function draw(){document.querySelectorAll('header [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v==V));
- $('#L').innerHTML=V=='st'?stUI():'<iframe id="dr" src="index.html?control"></iframe>';$('#R').style.display=V=='st'?'':'none';if(V=='dr'){$('#R').style.display='';}}
+ $('#L').innerHTML=V=='st'?stUI():V=='lb'?lbUI():'<iframe id="dr" src="index.html?control"></iframe>';scDraw()}
 addEventListener('change',async e=>{const t=e.target,d=t.dataset;
  if(d.up!==undefined&&t.files[0]){const f=t.files[0],k='f'+Date.now(),b=S.boxes[d.up];await put(k,f);b.key=k;b.type=f.type.startsWith('video')?'video':'img';sv();return draw()}
  if(d.bgup&&t.files[0]){const f=t.files[0],k='bg'+Date.now();await put(k,f);S.bg.key=k;S.bg.mt=f.type.startsWith('video')?'video':'img';sv();return draw()}
@@ -47,7 +50,7 @@ addEventListener('change',async e=>{const t=e.target,d=t.dataset;
  if(d.k=='tm.dur'&&!S.tm.run)S.tm.left=v;sv();if(/\.type$|^n[lr]$|\.anim$|^bg\.t$/.test(d.k))draw()});
 addEventListener('input',e=>{const d=e.target.dataset;if(d.k&&/text|color/.test(e.target.type)){sp(d.k,e.target.value);sv()}});
 addEventListener('click',e=>{const t=e.target,d=t.dataset,T=S.tm;
- if(d.v){V=d.v;draw()}if(d.cap!==undefined)$('#ov').contentWindow.cap(+d.cap);if(d.rp){S.rp=Date.now();sv()}
+ if(d.v){V=d.v;draw()}if(d.go){S.sc.cur=d.go;sv();scDraw()}if(d.lc)LC.postMessage({t:'cmd',c:d.lc});if(d.cap!==undefined)$('#ov').contentWindow.cap(+d.cap);if(d.rp){S.rp=Date.now();sv()}
  if(d.th){Object.assign(S.th,JSON.parse(d.th));sv();draw()}
  if(d.d){T.dur=+d.d;if(!T.run)T.left=T.dur;sv();draw()}
  if(d.t){if(d.t=='start'){if(!T.left)T.left=T.dur;T.end=Date.now()+T.left*1000;T.run=true}else if(d.t=='stop'){if(T.run)T.left=Math.max(0,Math.ceil((T.end-Date.now())/1000));T.run=false}else{T.left=T.dur;T.run=false}sv()}});

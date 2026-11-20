@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esports Broadcast Overlay & Timer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Font Khas Esports -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=Orbitron:wght@700;900&family=Oswald:wght@600;700&family=Rajdhani:wght@600;700&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Latar belakang dinamis ala arena siaran esports */
+        .esports-bg {
+            background-color: #070b19;
+            background-image:
+                radial-gradient(circle at 18% 22%, rgba(29, 78, 216, 0.45) 0%, transparent 45%),
+                radial-gradient(circle at 85% 65%, rgba(16, 185, 129, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.2) 0%, transparent 60%),
+                linear-gradient(135deg, #090e24 0%, #060918 55%, #071917 100%);
+        }
+
+        /* Ring dekorasi arena */
+        .arena-ring {
+            border: 1.5px solid rgba(56, 189, 248, 0.16);
+            box-shadow: 0 0 40px rgba(37, 99, 235, 0.18), inset 0 0 30px rgba(16, 185, 129, 0.12);
+        }
+
+        /* Animasi teks berjalan komentar penonton */
+        @keyframes tickerScroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: tickerScroll 18s linear infinite;
+        }
+        .animate-ticker:hover {
+            animation-play-state: paused;
+        }
+
+        /* Scrollbar halus pada panel pengaturan */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.4);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="esports-bg text-white font-['Inter'] min-h-screen overflow-x-hidden select-none relative">
+
+    <!-- Dekorasi Latar & Custom Background -->
+    <div id="bg-layer" class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="arena-ring absolute -top-40 -left-40 w-[650px] h-[650px] rounded-full"></div>
+        <div class="arena-ring absolute top-1/4 -right-52 w-[780px] h-[780px] rounded-full border-emerald-400/20"></div>
+        <div class="absolute bottom-16 right-1/4 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl"></div>
+        <div class="absolute top-12 left-1/3 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"></div>
+        <img id="custom-bg-img" src="" alt="Custom Background" class="hidden w-full h-full object-cover opacity-60 transition-all duration-300">
+    </div>
+
+    <!-- Hotspot kecil tak terlihat di pojok kanan atas untuk membuka panel pengaturan (Ctrl+E / Alt+E juga tersedia) -->
+    <button
+        type="button"
+        id="secret-settings-hotspot"
+        onclick="toggleEditorDrawer()"
+        title="Buka Pengaturan (Ctrl+E)"
+        aria-label="Buka Pengaturan"
+        class="fixed top-0 right-0 w-10 h-10 z-40 opacity-0 hover:opacity-100 focus:opacity-100 bg-slate-950/80 text-amber-300 flex items-center justify-center rounded-bl-xl transition-opacity duration-200 cursor-pointer">
+        <i class="fa-solid fa-sliders text-xs"></i>
+    </button>
+
+    <!-- ==================== KANVAS UTAMA SIARAN ESPORTS ==================== -->
+    <main class="relative z-10 max-w-[1440px] mx-auto min-h-screen px-4 sm:px-8 lg:px-12 py-5 flex flex-col justify-between gap-4">
+
+        <!-- BARIS ATAS: LOGO TURNAMEN (KIRI) & TIMER BESAR 00:00 (KANAN/TENGAH) -->
+        <header class="grid grid-cols-1 lg:grid-cols-12 items-center gap-4 pt-1">
+            <!-- Branding Event / Turnamen -->
+            <div class="lg:col-span-5 flex items-center gap-3 group cursor-pointer" onclick="triggerUpload('input-event-logo')" title="Klik untuk ganti logo turnamen">
+                <div class="relative flex flex-col">
+                    <span id="display-event-sub" class="text-xs sm:text-sm font-extrabold tracking-widest text-sky-300 uppercase italic inline-block transition-transform duration-150">MPL ID S18</span>
+                    <div class="flex items-center gap-2">
+                        <h1 id="display-event-title" class="font-['Anton'] text-4xl sm:text-5xl tracking-wide italic text-white drop-shadow-[0_4px_12px_rgba(56,189,248,0.45)] inline-block transition-transform duration-150">
+                            PLAYOFFS
+                        </h1>
+                        <!-- Logo Emblem -->
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/5 border border-white/15 flex items-center justify-center overflow-hidden relative shrink-0">
+                            <img id="display-event-logo" src="https://placehold.co/100x100/0f172a/38bdf8?text=MPL" onerror="this.onerror=null;this.src='https://placehold.co/100x100/0f172a/38bdf8?text=MPL';" alt="Logo Event" class="w-full h-full object-contain p-1">
+                            <span class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] font-semibold transition">Ganti</span>
+                        </div>
+                    </div>
+                    <span id="display-event-loc" class="text-[11px] sm:text-xs font-bold tracking-[0.28em] text-slate-200 uppercase text-right pr-2 inline-block transition-transform duration-150">SURABAYA</span>
+                </div>
+            </div>
+
+            <!-- TAMPILAN JAM / TIMER UTAMA (FORMAT 00:00) -->
+            <div class="lg:col-span-7 flex flex-col items-center lg:items-start lg:pl-6">
+                <div id="clock-display"
+                     onclick="toggleTimerPlay()"
+                     title="Klik untuk Mulai / Jeda Waktu"
+                     style="font-family: 'Anton', sans-serif; font-size: 112px; color: #ffffff;"
+                     class="leading-none tracking-tight cursor-pointer drop-shadow-[0_6px_24px_rgba(0,0,0,0.65)] transition-all duration-150 hover:scale-[1.01]">
+                    09:17
+                </div>
+            </div>
+        </header>
+
+        <!-- BARIS TENGAH: PANELIS & JADWAL MATCH (KIRI) + MULTI-BANNER & KOMENTAR (KANAN) -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end my-auto">
+
+            <!-- ==================== KOLOM KIRI (5 KOLOM): PANELIS + DAFTAR MATCH DINAMIS ==================== -->
+            <div class="lg:col-span-5 flex flex-col gap-3">
+
+                <!-- SEKSI PANELIS (FOTO BISA DISEMBUNYIKAN + BAR NAMA) -->
+                <div id="panelist-wrapper" class="relative transition-all duration-300">
+                    <!-- Grid 3 Foto Panelis -->
+                    <div id="panelist-photos-grid" class="grid grid-cols-3 gap-2 px-2 sm:px-4 items-end relative z-10 -mb-1 transition-all duration-300">
+                        <div class="flex flex-col items-center group cursor-pointer" onclick="triggerUpload('input-panelist-1')">
+                            <div class="w-24 h-28 sm:w-32 sm:h-36 overflow-hidden flex items-end justify-center relative">
+                                <img id="img-panelist-1" src="https://placehold.co/220x260/1e293b/ffffff?text=Panelis+1" onerror="this.onerror=null;this.src='https://placehold.co/220x260/1e293b/ffffff?text=Panelis+1';" alt="Panelis 1" class="w-full h-full object-cover object-top rounded-t-xl">
+                                <span class="absolute bottom-1 bg-black/75 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">Upload Foto</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center group cursor-pointer" onclick="triggerUpload('input-panelist-2')">
+                            <div class="w-24 h-28 sm:w-32 sm:h-36 overflow-hidden flex items-end justify-center relative">
+                                <img id="img-panelist-2" src="https://placehold.co/220x260/1e293b/ffffff?text=Panelis+2" onerror="this.onerror=null;this.src='https://placehold.co/220x260/1e293b/ffffff?text=Panelis+2';" alt="Panelis 2" class="w-full h-full object-cover object-top rounded-t-xl">
+                                <span class="absolute bottom-1 bg-black/75 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">Upload Foto</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center group cursor-pointer" onclick="triggerUpload('input-panelist-3')">
+                            <div class="w-24 h-28 sm:w-32 sm:h-36 overflow-hidden flex items-end justify-center relative">
+                                <img id="img-panelist-3" src="https://placehold.co/220x260/1e293b/ffffff?text=Panelis+3" onerror="this.onerror=null;this.src='https://placehold.co/220x260/1e293b/ffffff?text=Panelis+3';" alt="Panelis 3" class="w-full h-full object-cover object-top rounded-t-xl">
+                                <span class="absolute bottom-1 bg-black/75 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">Upload Foto</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bar Label PANELIST & Nama-Nama Panelis -->
+                    <div class="flex items-stretch shadow-xl relative z-20">
+                        <div class="bg-[#f4c07a] text-slate-950 px-3 sm:px-4 py-2 flex items-center gap-2 font-['Oswald'] font-bold tracking-wider text-xs sm:text-sm uppercase shrink-0">
+                            <i class="fa-solid fa-microphone-lines text-base"></i>
+                            <span id="display-panelist-label" class="inline-block transition-transform duration-150">PANELIST</span>
+                        </div>
+                        <div class="flex-1 bg-[#111526]/95 border-y border-r border-white/10 grid grid-cols-3 items-center text-center py-2 px-1 font-['Oswald'] font-semibold text-xs sm:text-sm tracking-wider uppercase text-slate-100">
+                            <div id="name-panelist-1" class="truncate px-1 border-r border-white/15 transition-transform duration-150">NEVINNE</div>
+                            <div id="name-panelist-2" class="truncate px-1 border-r border-white/15 transition-transform duration-150">OM WAWA</div>
+                            <div id="name-panelist-3" class="truncate px-1 transition-transform duration-150">TALITHA</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KONTAINER KARTU MATCH DINAMIS -->
+                <div id="matches-overlay-container" class="flex flex-col gap-2.5"></div>
+            </div>
+
+            <!-- ==================== KOLOM KANAN (7 KOLOM): MULTI-BANNER/VIDEO & AUDIENCE COMMENT ==================== -->
+            <div class="lg:col-span-7 flex flex-col gap-4">
+
+                <!-- Kontainer Multi-Banner / Multi-Video Dinamis -->
+                <div id="banners-overlay-container" class="flex flex-col gap-3 w-full"></div>
+
+                <!-- Seksi AUDIENCE COMMENT -->
+                <div class="flex flex-col shadow-xl">
+                    <div class="bg-[#111526]/95 border-t border-x border-white/10 px-3 py-1.5 flex items-center gap-2 text-xs font-['Oswald'] tracking-wider">
+                        <span class="w-2.5 h-2.5 bg-[#f4c07a] inline-block"></span>
+                        <span class="font-bold text-slate-200 uppercase">AUDIENCE COMMENT</span>
+                        <span class="text-white/30">|</span>
+                        <span id="display-comment-user" class="text-slate-300 font-['Inter'] font-medium inline-block transition-transform duration-150">@heylul96</span>
+                    </div>
+                    <div class="bg-[#f4c07a] text-slate-950 py-2 px-4 font-bold text-sm sm:text-base overflow-hidden relative">
+                        <div id="display-comment-text" class="animate-ticker font-['Inter'] tracking-tight transition-transform duration-150">
+                            AE bisa yukkk. Semangat terus buat semua tim di Playoffs Surabaya! #WEOWNTHIS
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- BARIS BAWAH: SLOGAN, BASE BRAND & TEKS WHATSAPP + INSTAGRAM (TANPA SHAPE) -->
+        <footer class="pt-2 flex flex-wrap items-center justify-between gap-4 border-t border-white/10">
+            <div class="flex flex-wrap items-center gap-3 sm:gap-5">
+                <div id="display-hashtag" class="font-['Anton'] text-2xl sm:text-3xl italic tracking-wider uppercase text-white drop-shadow inline-block transition-transform duration-150">
+                    WEOWNTHIS
+                </div>
+                <span class="hidden sm:inline text-white/25">|</span>
+                <div id="display-base-brand" class="font-['Oswald'] font-bold text-xs sm:text-sm tracking-[0.2em] uppercase text-[#f4c07a] inline-flex items-center gap-1.5 transition-transform duration-150">
+                    <i class="fa-solid fa-trophy text-[#f4c07a] text-xs"></i>
+                    <span id="display-base-brand-text">TOURNAMENT BY ARTHES</span>
+                </div>
+            </div>
+
+            <!-- Teks WhatsApp & Instagram Polos Tanpa Shape -->
+            <div id="social-media-bar" class="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm font-semibold">
+                <span id="display-wa-text" class="text-emerald-300 inline-flex items-center gap-1.5 transition-transform duration-150">
+                    <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i>
+                    <span id="display-wa-value">0812-3456-7890</span>
+                </span>
+                <span id="display-ig-text" class="text-pink-300 inline-flex items-center gap-1.5 transition-transform duration-150">
+                    <i class="fa-brands fa-instagram text-base text-pink-400"></i>
+                    <span id="display-ig-value">@arthes.tournament</span>
+                </span>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- ==================== INPUT FILE TERSEMBUNYI ==================== -->
+    <input type="file" id="input-event-logo" accept="image/*" class="hidden" onchange="handleImageUpload(this, 'display-event-logo')">
+    <input type="file" id="input-panelist-1" accept="image/*" class="hidden" onchange="handleImageUpload(this, 'img-panelist-1')">
+    <input type="file" id="input-panelist-2" accept="image/*" class="hidden" onchange="handleImageUpload(this, 'img-panelist-2')">
+    <input type="file" id="input-panelist-3" accept="image/*" class="hidden" onchange="handleImageUpload(this, 'img-panelist-3')">
+    <input type="file" id="input-dynamic-match-logo" accept="image/*" class="hidden" onchange="handleDynamicMatchLogoUpload(this)">
+    <input type="file" id="input-dynamic-banner-media" accept="image/*,video/*" class="hidden" onchange="handleDynamicBannerMediaUpload(this)">
+    <input type="file" id="input-custom-bg" accept="image/*" class="hidden" onchange="handleBgUpload(this)">
+
+    <!-- ==================== PANEL SAMPING (EDITOR LENGKAP) ==================== -->
+    <aside id="editor-drawer" class="fixed inset-y-0 right-0 w-full sm:w-[430px] bg-slate-950/95 backdrop-blur-xl border-l border-white/15 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+        <!-- Header Drawer -->
+        <div class="p-4 border-b border-white/10 flex items-center justify-between bg-slate-900/80">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-amber-400"></i>
+                <h2 class="font-bold text-sm uppercase tracking-wider">Kustomisasi Siaran & Timer</h2>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <button type="button" onclick="toggleFullscreen()" title="Layar Penuh" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300">
+                    <i class="fa-solid fa-expand text-xs"></i>
+                </button>
+                <button type="button" onclick="toggleEditorDrawer()" title="Tutup Pengaturan" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigasi 4 Tab Editor -->
+        <div class="grid grid-cols-4 border-b border-white/10 text-[11px] font-semibold bg-slate-900/40">
+            <button type="button" onclick="switchEditorTab('tab-timer')" id="btn-tab-timer" class="py-3 border-b-2 border-amber-400 text-amber-400">1. Timer</button>
+            <button type="button" onclick="switchEditorTab('tab-panel')" id="btn-tab-panel" class="py-3 border-b-2 border-transparent text-slate-400 hover:text-white">2. Panelis</button>
+            <button type="button" onclick="switchEditorTab('tab-media')" id="btn-tab-media" class="py-3 border-b-2 border-transparent text-slate-400 hover:text-white">3. BG & Banner</button>
+            <button type="button" onclick="switchEditorTab('tab-texts')" id="btn-tab-texts" class="py-3 border-b-2 border-transparent text-slate-400 hover:text-white">4. Posisi Teks</button>
+        </div>
+
+        <!-- Isi Konten Editor -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-5 text-sm">
+
+            <!-- TAB 1: PENGATURAN TIMER, STOPWATCH & FONT -->
+            <div id="tab-timer" class="space-y-4">
+                <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10 space-y-3">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Kontrol Waktu (00:00)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="toggleTimerPlay()" id="drawer-play-btn" class="py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-play"></i><span>Mulai</span>
+                        </button>
+                        <button type="button" onclick="resetClock()" class="py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-rotate-left"></i><span>Reset</span>
+                        </button>
+                        <button type="button" onclick="setClockMode('timer')" id="mode-timer-btn" class="py-2 rounded-xl bg-sky-500 text-slate-950 font-bold text-xs">
+                            Timer
+                        </button>
+                    </div>
+                    <button type="button" onclick="setClockMode('stopwatch')" id="mode-stopwatch-btn" class="w-full py-2 rounded-xl bg-white/10 text-slate-300 font-semibold text-xs">
+                        <i class="fa-solid fa-stopwatch mr-1"></i> Mode Stopwatch
+                    </button>
+
+                    <div id="timer-setter-box" class="pt-2 space-y-2">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1">
+                                <span class="text-[11px] text-slate-400">Menit</span>
+                                <input type="number" id="input-minutes" value="9" min="0" max="99" onchange="applyTimerInputs()" class="w-full mt-1 bg-black/50 border border-white/15 rounded-lg px-3 py-1.5 text-center font-bold">
+                            </div>
+                            <span class="text-xl font-bold pt-4">:</span>
+                            <div class="flex-1">
+                                <span class="text-[11px] text-slate-400">Detik</span>
+                                <input type="number" id="input-seconds" value="17" min="0" max="59" onchange="applyTimerInputs()" class="w-full mt-1 bg-black/50 border border-white/15 rounded-lg px-3 py-1.5 text-center font-bold">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            <button type="button" onclick="setPresetMinutes(3)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs">03:00</button>
+                            <button type="button" onclick="setPresetMinutes(5)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs">05:00</button>
+                            <button type="button" onclick="setPresetMinutes(10)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs">10:00</button>
+                            <button type="button" onclick="setPresetMinutes(15)" class="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs">15:00</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10 space-y-3">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Gaya Font & Warna Timer</label>
+                    <div>
+                        <span class="text-xs text-slate-300">Pilih Jenis Font</span>
+                        <select id="ed-font-family" onchange="updateClockStyle()" class="w-full mt-1 bg-slate-900 border border-white/15 rounded-xl px-3 py-2 text-sm text-white">
+                            <option value="'Anton', sans-serif" selected>Anton (Tinggi & Tebal)</option>
+                            <option value="'Bebas Neue', sans-serif">Bebas Neue (Condensed Modern)</option>
+                            <option value="'Teko', sans-serif">Teko (Esports Digital)</option>
+                            <option value="'Orbitron', sans-serif">Orbitron (Futuristik Sci-Fi)</option>
+                            <option value="'Oswald', sans-serif">Oswald (Tegas & Rapi)</option>
+                            <option value="'Rajdhani', sans-serif">Rajdhani (Teknologi)</option>
+                            <option value="'Inter', sans-serif">Inter (Minimalis Bersih)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs text-slate-300">
+                            <span>Ukuran Font</span>
+                            <span id="font-size-val" class="font-mono text-amber-400">112px</span>
+                        </div>
+                        <input type="range" id="ed-font-size" min="56" max="170" value="112" oninput="updateClockStyle()" class="w-full mt-1 accent-amber-500">
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-xs text-slate-300">Warna Angka Timer</span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="setClockColor('#ffffff')" class="w-6 h-6 rounded-full bg-white border border-slate-500"></button>
+                            <button type="button" onclick="setClockColor('#f4c07a')" class="w-6 h-6 rounded-full bg-[#f4c07a] border border-slate-500"></button>
+                            <button type="button" onclick="setClockColor('#38bdf8')" class="w-6 h-6 rounded-full bg-sky-400 border border-slate-500"></button>
+                            <button type="button" onclick="setClockColor('#34d399')" class="w-6 h-6 rounded-full bg-emerald-400 border border-slate-500"></button>
+                            <input type="color" id="ed-font-color" value="#ffffff" oninput="updateClockStyle()" class="w-7 h-7 rounded bg-transparent cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: PANELIS & JADWAL MATCH -->
+            <div id="tab-panel" class="hidden space-y-5">
+                <div class="space-y-3 bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase text-amber-400">Seksi Panelis</h3>
+                        <input type="text" id="ed-panel-label" value="PANELIST" oninput="syncTexts()" class="w-28 bg-black/40 border border-white/15 rounded px-2 py-1 text-xs text-center font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <label class="flex items-center justify-between bg-black/30 px-3 py-2 rounded-xl border border-white/10 cursor-pointer">
+                            <span class="text-xs font-medium">Foto di Atas</span>
+                            <input type="checkbox" id="toggle-panelist-photos" checked onchange="togglePanelistVisibility()" class="accent-amber-500 w-4 h-4">
+                        </label>
+                        <label class="flex items-center justify-between bg-black/30 px-3 py-2 rounded-xl border border-white/10 cursor-pointer">
+                            <span class="text-xs font-medium">Bar Panelis</span>
+                            <input type="checkbox" id="toggle-panelist-section" checked onchange="togglePanelistVisibility()" class="accent-amber-500 w-4 h-4">
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="ed-p1-name" value="NEVINNE" oninput="syncTexts()" placeholder="Nama Panelis 1" class="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                        <button type="button" onclick="triggerUpload('input-panelist-1')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold shrink-0">
+                            <i class="fa-solid fa-upload mr-1"></i>Foto 1
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="ed-p2-name" value="OM WAWA" oninput="syncTexts()" placeholder="Nama Panelis 2" class="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                        <button type="button" onclick="triggerUpload('input-panelist-2')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold shrink-0">
+                            <i class="fa-solid fa-upload mr-1"></i>Foto 2
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="ed-p3-name" value="TALITHA" oninput="syncTexts()" placeholder="Nama Panelis 3" class="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                        <button type="button" onclick="triggerUpload('input-panelist-3')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold shrink-0">
+                            <i class="fa-solid fa-upload mr-1"></i>Foto 3
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase text-sky-400">Daftar Pertandingan (<span id="match-count-badge">2</span> Match)</h3>
+                        <button type="button" onclick="addNewMatch()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Tambah Match</span>
+                        </button>
+                    </div>
+                    <div id="editor-matches-list" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- TAB 3: BACKGROUND, BANNER, EVENT & KOMENTAR -->
+            <div id="tab-media" class="hidden space-y-5">
+                <div class="space-y-3 bg-white/5 p-3.5 rounded-2xl border border-emerald-500/30">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase text-emerald-400">Background Layar</h3>
+                        <div class="flex gap-1.5">
+                            <button type="button" onclick="triggerUpload('input-custom-bg')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-upload"></i> Upload BG
+                            </button>
+                            <button type="button" onclick="resetBg()" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-semibold">Reset</button>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-[11px] text-slate-300">
+                            <span>Kecerahan / Opacity BG</span>
+                            <span id="bg-opacity-val" class="font-mono text-emerald-400">60%</span>
+                        </div>
+                        <input type="range" id="ed-bg-opacity" min="10" max="100" value="60" oninput="updateBgStyle()" class="w-full accent-emerald-500">
+                    </div>
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-[11px] text-slate-300">
+                            <span>Efek Blur BG</span>
+                            <span id="bg-blur-val" class="font-mono text-emerald-400">0px</span>
+                        </div>
+                        <input type="range" id="ed-bg-blur" min="0" max="20" value="0" oninput="updateBgStyle()" class="w-full accent-emerald-500">
+                    </div>
+                </div>
+
+                <div class="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase text-amber-400">Judul Turnamen & Slogan</h3>
+                        <button type="button" onclick="triggerUpload('input-event-logo')" class="px-2.5 py-1 rounded bg-indigo-600 text-xs font-semibold">Upload Logo</button>
+                    </div>
+                    <input type="text" id="ed-ev-sub" value="MPL ID S18" oninput="syncTexts()" placeholder="Subjudul Event" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                    <input type="text" id="ed-ev-title" value="PLAYOFFS" oninput="syncTexts()" placeholder="Judul Utama" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                    <input type="text" id="ed-ev-loc" value="SURABAYA" oninput="syncTexts()" placeholder="Lokasi" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                    <input type="text" id="ed-hashtag" value="WEOWNTHIS" oninput="syncTexts()" placeholder="Slogan Bawah" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                    <input type="text" id="ed-base-brand" value="TOURNAMENT BY ARTHES" oninput="syncTexts()" placeholder="Base Brand" class="w-full bg-black/40 border border-amber-400/30 rounded-lg px-3 py-1.5 text-xs text-amber-300 font-semibold">
+                </div>
+
+                <div class="space-y-2.5 bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase text-pink-400">Teks WA & IG</h3>
+                        <label class="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="toggle-social-bar" checked onchange="toggleSocialVisibility()" class="accent-amber-500">
+                            <span>Tampilkan</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-emerald-400 text-base w-5 text-center"></i>
+                        <input type="text" id="ed-wa-text" value="0812-3456-7890" oninput="syncTexts()" placeholder="Nomor WhatsApp" class="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-brands fa-instagram text-pink-400 text-base w-5 text-center"></i>
+                        <input type="text" id="ed-ig-text" value="@arthes.tournament" oninput="syncTexts()" placeholder="Username Instagram" class="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                    </div>
+                </div>
+
+                <div class="space-y-3 bg-white/5 p-3.5 rounded-2xl border border-sky-500/30">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase text-sky-400">Banner / Video (<span id="banner-count-badge">1</span> Slot)</h3>
+                        <button type="button" onclick="addNewBanner()" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1 transition">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Tambah Banner/Video</span>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="setBannerLayout('vertical')" id="btn-layout-vertical" class="py-1.5 px-2 rounded-lg bg-sky-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-bars"></i> Vertikal (Susun)
+                        </button>
+                        <button type="button" onclick="setBannerLayout('grid')" id="btn-layout-grid" class="py-1.5 px-2 rounded-lg bg-white/10 text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-table-columns"></i> Grid (Sampingan)
+                        </button>
+                    </div>
+                    <div id="editor-banners-list" class="space-y-3"></div>
+                </div>
+
+                <div class="space-y-2 bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                    <h3 class="text-xs font-bold uppercase text-emerald-400">Audience Comment</h3>
+                    <input type="text" id="ed-comm-user" value="@heylul96" oninput="syncTexts()" placeholder="@username" class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">
+                    <textarea id="ed-comm-text" rows="2" oninput="syncTexts()" placeholder="Isi komentar berjalan..." class="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs">AE bisa yukkk. Semangat terus buat semua tim di Playoffs Surabaya! #WEOWNTHIS</textarea>
+                </div>
+            </div>
+
+            <!-- TAB 4: ATUR POSISI & UKURAN SEMUA TEKS -->
+            <div id="tab-texts" class="hidden space-y-4">
+                <div class="bg-white/5 p-3.5 rounded-2xl border border-amber-400/30 flex items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase text-amber-400">Ukuran & Posisi Teks</h3>
+                        <p class="text-[11px] text-slate-400">Atur ukuran font (px) serta geser X & Y tiap teks.</p>
+                    </div>
+                    <button type="button" onclick="resetAllTextTransforms()" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-semibold shrink-0">
+                        <i class="fa-solid fa-rotate-left mr-1"></i>Reset Semua
+                    </button>
+                </div>
+                <div id="text-controls-list" class="space-y-3"></div>
+
+                <!-- Simpan & Muat Konfigurasi Visual untuk GitHub -->
+                <div class="bg-white/5 p-3.5 rounded-2xl border border-emerald-400/30 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase text-emerald-400">Preset Visual (GitHub)</h3>
+                        <button type="button" onclick="downloadPresetJSON()" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">
+                            <i class="fa-solid fa-download mr-1"></i>Simpan JSON
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-400">
+                        Unduh file preset atau tempel/muat konfigurasi agar orang yang membuka halaman di GitHub melihat visual yang sama.
+                    </p>
+                    <textarea id="preset-json-box" rows="4" placeholder="JSON konfigurasi visual akan muncul di sini atau tempel JSON preset di sini..." class="w-full bg-black/50 border border-white/15 rounded-lg p-2.5 text-[11px] font-mono text-slate-200"></textarea>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="exportPresetToBox()" class="py-1.5 px-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold">
+                            Generate JSON
+                        </button>
+                        <button type="button" onclick="applyPresetFromBox()" class="py-1.5 px-2.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold">
+                            Terapkan JSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- ==================== LOGIKA JAVASCRIPT ==================== -->
+    <script>
+        // State Timer / Stopwatch
+        let clockMode = 'timer';
+        let isRunning = false;
+        let initialSeconds = 9 * 60 + 17;
+        let currentSeconds = initialSeconds;
+        let timerInterval = null;
+
+        const clockDisplay = document.getElementById('clock-display');
+        const drawerPlayBtn = document.getElementById('drawer-play-btn');
+
+        function formatMMSS(totalSec) {
+            const safeSec = Math.max(0, Math.floor(totalSec));
+            const mins = Math.floor(safeSec / 60);
+            const secs = safeSec % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function renderClock() {
+            if (clockDisplay) clockDisplay.textContent = formatMMSS(currentSeconds);
+        }
+
+        function setClockMode(mode) {
+            pauseClock();
+            clockMode = mode;
+            const timerBtn = document.getElementById('mode-timer-btn');
+            const swBtn = document.getElementById('mode-stopwatch-btn');
+            const setterBox = document.getElementById('timer-setter-box');
+
+            if (mode === 'timer') {
+                if (timerBtn) timerBtn.className = 'py-2 rounded-xl bg-sky-500 text-slate-950 font-bold text-xs';
+                if (swBtn) swBtn.className = 'w-full py-2 rounded-xl bg-white/10 text-slate-300 font-semibold text-xs';
+                if (setterBox) setterBox.classList.remove('hidden');
+                applyTimerInputs();
+            } else {
+                if (swBtn) swBtn.className = 'w-full py-2 rounded-xl bg-sky-500 text-slate-950 font-bold text-xs';
+                if (timerBtn) timerBtn.className = 'py-2 rounded-xl bg-white/10 text-slate-300 font-semibold text-xs';
+                if (setterBox) setterBox.classList.add('hidden');
+                currentSeconds = 0;
+                renderClock();
+            }
+        }
+
+        function applyTimerInputs() {
+            const mInput = document.getElementById('input-minutes');
+            const sInput = document.getElementById('input-seconds');
+            const m = parseInt(mInput ? mInput.value : 0, 10) || 0;
+            const s = parseInt(sInput ? sInput.value : 0, 10) || 0;
+            initialSeconds = m * 60 + Math.min(59, Math.max(0, s));
+            currentSeconds = initialSeconds;
+            renderClock();
+        }
+
+        function setPresetMinutes(mins) {
+            pauseClock();
+            const mInput = document.getElementById('input-minutes');
+            const sInput = document.getElementById('input-seconds');
+            if (mInput) mInput.value = mins;
+            if (sInput) sInput.value = 0;
+            applyTimerInputs();
+        }
+
+        function toggleTimerPlay() {
+            if (isRunning) pauseClock();
+            else startClock();
+        }
+
+        function updatePlayButtonsUI(running) {
+            if (!drawerPlayBtn) return;
+            if (running) {
+                drawerPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i><span>Jeda</span>';
+                drawerPlayBtn.classList.replace('bg-amber-500', 'bg-rose-500');
+                drawerPlayBtn.classList.replace('text-slate-950', 'text-white');
+            } else {
+                drawerPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i><span>Mulai</span>';
+                drawerPlayBtn.classList.replace('bg-rose-500', 'bg-amber-500');
+                drawerPlayBtn.classList.replace('text-white', 'text-slate-950');
+            }
+        }
+
+        function startClock() {
+            if (isRunning) return;
+            if (clockMode === 'timer' && currentSeconds <= 0) {
+                currentSeconds = initialSeconds;
+            }
+            isRunning = true;
+            updatePlayButtonsUI(true);
+
+            timerInterval = setInterval(() => {
+                if (clockMode === 'timer') {
+                    if (currentSeconds > 0) {
+                        currentSeconds--;
+                        renderClock();
+                    } else {
+                        pauseClock();
+                        playAlarmBeep();
+                    }
+                } else {
+                    currentSeconds++;
+                    renderClock();
+                }
+            }, 1000);
+        }
+
+        function pauseClock() {
+            isRunning = false;
+            clearInterval(timerInterval);
+            updatePlayButtonsUI(false);
+        }
+
+        function resetClock() {
+            pauseClock();
+            currentSeconds = clockMode === 'timer' ? initialSeconds : 0;
+            renderClock();
+        }
+
+        function playAlarmBeep() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.8);
+            } catch (e) {}
+        }
+
+        // Gaya Timer
+        function updateClockStyle() {
+            if (!clockDisplay) return;
+            const fontFamEl = document.getElementById('ed-font-family');
+            const fontSizeEl = document.getElementById('ed-font-size');
+            const fontColorEl = document.getElementById('ed-font-color');
+            const sizeValEl = document.getElementById('font-size-val');
+
+            if (fontFamEl) clockDisplay.style.fontFamily = fontFamEl.value;
+            if (fontSizeEl) {
+                clockDisplay.style.fontSize = `${fontSizeEl.value}px`;
+                if (sizeValEl) sizeValEl.textContent = `${fontSizeEl.value}px`;
+            }
+            if (fontColorEl) clockDisplay.style.color = fontColorEl.value;
+        }
+
+        function setClockColor(hex) {
+            const colorInput = document.getElementById('ed-font-color');
+            if (colorInput) colorInput.value = hex;
+            updateClockStyle();
+        }
+
+        // Ekspor & Impor Preset Visual (JSON) agar mudah dibagikan lewat GitHub
+        function buildVisualPreset() {
+            const safeBanners = bannersData.map(b => ({
+                id: b.id,
+                mediaType: b.mediaType === 'video' ? 'video' : 'image',
+                src: b.src && b.src.startsWith('blob:') ? '' : b.src,
+                title: b.title || '',
+                sub: b.sub || '',
+                muted: !!b.muted
+            }));
+
+            return {
+                version: 1,
+                clock: {
+                    mode: clockMode,
+                    initialSeconds,
+                    minutes: parseInt(getInputValue('input-minutes', '9'), 10) || 0,
+                    seconds: parseInt(getInputValue('input-seconds', '17'), 10) || 0,
+                    fontFamily: getInputValue('ed-font-family', "'Anton', sans-serif"),
+                    fontSize: parseInt(getInputValue('ed-font-size', '112'), 10) || 112,
+                    fontColor: getInputValue('ed-font-color', '#ffffff')
+                },
+                panelist: {
+                    label: getInputValue('ed-panel-label', 'PANELIST'),
+                    showPhotos: !!document.getElementById('toggle-panelist-photos')?.checked,
+                    showSection: !!document.getElementById('toggle-panelist-section')?.checked,
+                    p1Name: getInputValue('ed-p1-name', 'NEVINNE'),
+                    p2Name: getInputValue('ed-p2-name', 'OM WAWA'),
+                    p3Name: getInputValue('ed-p3-name', 'TALITHA'),
+                    p1Img: document.getElementById('img-panelist-1')?.src || '',
+                    p2Img: document.getElementById('img-panelist-2')?.src || '',
+                    p3Img: document.getElementById('img-panelist-3')?.src || ''
+                },
+                event: {
+                    sub: getInputValue('ed-ev-sub', 'MPL ID S18'),
+                    title: getInputValue('ed-ev-title', 'PLAYOFFS'),
+                    loc: getInputValue('ed-ev-loc', 'SURABAYA'),
+                    hashtag: getInputValue('ed-hashtag', 'WEOWNTHIS'),
+                    baseBrand: getInputValue('ed-base-brand', 'TOURNAMENT BY ARTHES'),
+                    logo: document.getElementById('display-event-logo')?.src || ''
+                },
+                social: {
+                    show: !!document.getElementById('toggle-social-bar')?.checked,
+                    wa: getInputValue('ed-wa-text', '0812-3456-7890'),
+                    ig: getInputValue('ed-ig-text', '@arthes.tournament')
+                },
+                background: {
+                    src: document.getElementById('custom-bg-img')?.classList.contains('hidden')
+                        ? ''
+                        : (document.getElementById('custom-bg-img')?.src || ''),
+                    opacity: parseInt(getInputValue('ed-bg-opacity', '60'), 10) || 60,
+                    blur: parseInt(getInputValue('ed-bg-blur', '0'), 10) || 0
+                },
+                comment: {
+                    user: getInputValue('ed-comm-user', '@heylul96'),
+                    text: getInputValue('ed-comm-text', '')
+                },
+                bannerLayout,
+                banners: safeBanners,
+                matches: matchesData,
+                textConfigs: textConfigs.map(c => ({
+                    key: c.key,
+                    size: c.size,
+                    x: c.x,
+                    y: c.y
+                }))
+            };
+        }
+
+        function exportPresetToBox() {
+            const box = document.getElementById('preset-json-box');
+            if (!box) return;
+            box.value = JSON.stringify(buildVisualPreset(), null, 2);
+        }
+
+        function downloadPresetJSON() {
+            const jsonStr = JSON.stringify(buildVisualPreset(), null, 2);
+            const box = document.getElementById('preset-json-box');
+            if (box) box.value = jsonStr;
+
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'esports-overlay-preset.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function applyPresetObject(preset) {
+            if (!preset || typeof preset !== 'object') return;
+
+            if (preset.clock) {
+                const mEl = document.getElementById('input-minutes');
+                const sEl = document.getElementById('input-seconds');
+                const ffEl = document.getElementById('ed-font-family');
+                const fsEl = document.getElementById('ed-font-size');
+                const fcEl = document.getElementById('ed-font-color');
+
+                if (mEl && typeof preset.clock.minutes === 'number') mEl.value = preset.clock.minutes;
+                if (sEl && typeof preset.clock.seconds === 'number') sEl.value = preset.clock.seconds;
+                if (ffEl && preset.clock.fontFamily) ffEl.value = preset.clock.fontFamily;
+                if (fsEl && typeof preset.clock.fontSize === 'number') fsEl.value = preset.clock.fontSize;
+                if (fcEl && preset.clock.fontColor) fcEl.value = preset.clock.fontColor;
+
+                setClockMode(preset.clock.mode === 'stopwatch' ? 'stopwatch' : 'timer');
+                if (typeof preset.clock.initialSeconds === 'number') {
+                    initialSeconds = preset.clock.initialSeconds;
+                    currentSeconds = preset.clock.mode === 'stopwatch' ? 0 : initialSeconds;
+                    renderClock();
+                }
+                updateClockStyle();
+            }
+
+            if (preset.panelist) {
+                const setVal = (id, v) => {
+                    const el = document.getElementById(id);
+                    if (el && typeof v === 'string') el.value = v;
+                };
+                setVal('ed-panel-label', preset.panelist.label);
+                setVal('ed-p1-name', preset.panelist.p1Name);
+                setVal('ed-p2-name', preset.panelist.p2Name);
+                setVal('ed-p3-name', preset.panelist.p3Name);
+
+                const pPhotos = document.getElementById('toggle-panelist-photos');
+                const pSec = document.getElementById('toggle-panelist-section');
+                if (pPhotos && typeof preset.panelist.showPhotos === 'boolean') pPhotos.checked = preset.panelist.showPhotos;
+                if (pSec && typeof preset.panelist.showSection === 'boolean') pSec.checked = preset.panelist.showSection;
+                togglePanelistVisibility();
+
+                const setImg = (id, src) => {
+                    const img = document.getElementById(id);
+                    if (img && src) img.src = src;
+                };
+                setImg('img-panelist-1', preset.panelist.p1Img);
+                setImg('img-panelist-2', preset.panelist.p2Img);
+                setImg('img-panelist-3', preset.panelist.p3Img);
+            }
+
+            if (preset.event) {
+                const setVal = (id, v) => {
+                    const el = document.getElementById(id);
+                    if (el && typeof v === 'string') el.value = v;
+                };
+                setVal('ed-ev-sub', preset.event.sub);
+                setVal('ed-ev-title', preset.event.title);
+                setVal('ed-ev-loc', preset.event.loc);
+                setVal('ed-hashtag', preset.event.hashtag);
+                setVal('ed-base-brand', preset.event.baseBrand);
+                const evLogo = document.getElementById('display-event-logo');
+                if (evLogo && preset.event.logo) evLogo.src = preset.event.logo;
+            }
+
+            if (preset.social) {
+                const waEl = document.getElementById('ed-wa-text');
+                const igEl = document.getElementById('ed-ig-text');
+                const tgEl = document.getElementById('toggle-social-bar');
+                if (waEl && typeof preset.social.wa === 'string') waEl.value = preset.social.wa;
+                if (igEl && typeof preset.social.ig === 'string') igEl.value = preset.social.ig;
+                if (tgEl && typeof preset.social.show === 'boolean') tgEl.checked = preset.social.show;
+                toggleSocialVisibility();
+            }
+
+            if (preset.background) {
+                const opEl = document.getElementById('ed-bg-opacity');
+                const blEl = document.getElementById('ed-bg-blur');
+                const bgImg = document.getElementById('custom-bg-img');
+                if (opEl && typeof preset.background.opacity === 'number') opEl.value = preset.background.opacity;
+                if (blEl && typeof preset.background.blur === 'number') blEl.value = preset.background.blur;
+
+                if (bgImg) {
+                    if (preset.background.src) {
+                        bgImg.src = preset.background.src;
+                        bgImg.classList.remove('hidden');
+                    } else {
+                        bgImg.src = '';
+                        bgImg.classList.add('hidden');
+                    }
+                }
+                updateBgStyle();
+            }
+
+            if (preset.comment) {
+                const uEl = document.getElementById('ed-comm-user');
+                const tEl = document.getElementById('ed-comm-text');
+                if (uEl && typeof preset.comment.user === 'string') uEl.value = preset.comment.user;
+                if (tEl && typeof preset.comment.text === 'string') tEl.value = preset.comment.text;
+            }
+
+            if (Array.isArray(preset.matches) && preset.matches.length > 0) {
+                matchesData = preset.matches;
+                renderAllMatches();
+            }
+
+            if (preset.bannerLayout === 'grid' || preset.bannerLayout === 'vertical') {
+                bannerLayout = preset.bannerLayout;
+            }
+
+            if (Array.isArray(preset.banners) && preset.banners.length > 0) {
+                bannersData = preset.banners.map((b, idx) => ({
+                    id: b.id || Date.now() + idx,
+                    mediaType: b.mediaType === 'video' ? 'video' : 'image',
+                    src: b.src || `https://placehold.co/1280x720/0f172a/38bdf8?text=BANNER+%23${idx + 1}`,
+                    title: b.title || '',
+                    sub: b.sub || '',
+                    muted: b.muted !== false
+                }));
+                setBannerLayout(bannerLayout);
+                renderAllBanners();
+            }
+
+            if (Array.isArray(preset.textConfigs)) {
+                preset.textConfigs.forEach(item => {
+                    const target = textConfigs.find(c => c.key === item.key);
+                    if (target) {
+                        if (typeof item.size === 'number') target.size = item.size;
+                        if (typeof item.x === 'number') target.x = item.x;
+                        if (typeof item.y === 'number') target.y = item.y;
+                    }
+                });
+                renderTextControlsList();
+                applyAllTextTransforms();
+            }
+
+            syncTexts();
+        }
+
+        function applyPresetFromBox() {
+            const box = document.getElementById('preset-json-box');
+            if (!box || !box.value.trim()) return;
+            try {
+                const parsed = JSON.parse(box.value.trim());
+                applyPresetObject(parsed);
+            } catch (err) {
+                console.error('JSON preset tidak valid:', err);
+            }
+        }
+
+        // Upload Gambar & Background
+        function triggerUpload(inputId) {
+            try {
+                const inputEl = document.getElementById(inputId);
+                if (inputEl) inputEl.click();
+            } catch (err) {
+                console.error('Upload trigger error:', err);
+            }
+        }
+
+        function handleImageUpload(inputElement, targetImgId) {
+            const file = inputElement.files && inputElement.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const targetImg = document.getElementById(targetImgId);
+                if (targetImg && e.target && e.target.result) {
+                    targetImg.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+            inputElement.value = '';
+        }
+
+        function handleBgUpload(inputElement) {
+            const file = inputElement.files && inputElement.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const bgImg = document.getElementById('custom-bg-img');
+                if (bgImg && e.target && e.target.result) {
+                    bgImg.src = e.target.result;
+                    bgImg.classList.remove('hidden');
+                    updateBgStyle();
+                }
+            };
+            reader.readAsDataURL(file);
+            inputElement.value = '';
+        }
+
+        function updateBgStyle() {
+            const bgImg = document.getElementById('custom-bg-img');
+            const opacityEl = document.getElementById('ed-bg-opacity');
+            const blurEl = document.getElementById('ed-bg-blur');
+            const opVal = document.getElementById('bg-opacity-val');
+            const blVal = document.getElementById('bg-blur-val');
+
+            if (bgImg && opacityEl) {
+                bgImg.style.opacity = opacityEl.value / 100;
+                if (opVal) opVal.textContent = `${opacityEl.value}%`;
+            }
+            if (bgImg && blurEl) {
+                bgImg.style.filter = `blur(${blurEl.value}px)`;
+                if (blVal) blVal.textContent = `${blurEl.value}px`;
+            }
+        }
+
+        function resetBg() {
+            const bgImg = document.getElementById('custom-bg-img');
+            if (bgImg) {
+                bgImg.src = '';
+                bgImg.classList.add('hidden');
+            }
+        }
+
+        // Visibilitas Panelis
+        function togglePanelistVisibility() {
+            const showPhotos = document.getElementById('toggle-panelist-photos')?.checked ?? true;
+            const showSection = document.getElementById('toggle-panelist-section')?.checked ?? true;
+            const photosGrid = document.getElementById('panelist-photos-grid');
+            const wrapper = document.getElementById('panelist-wrapper');
+
+            if (wrapper) wrapper.classList.toggle('hidden', !showSection);
+            if (photosGrid) photosGrid.classList.toggle('hidden', !showPhotos);
+        }
+
+        // Manajemen Match Dinamis
+        let matchesData = [
+            {
+                id: 1,
+                title: 'MATCH 1 | BO5',
+                time: '14:30 WIB',
+                score1: 0,
+                score2: 0,
+                logo1: 'https://placehold.co/100x100/111827/ef4444?text=AE',
+                logo2: 'https://placehold.co/100x100/111827/facc15?text=ONIC'
+            },
+            {
+                id: 2,
+                title: 'MATCH 2 | BO5',
+                time: '19:15 WIB',
+                score1: 0,
+                score2: 0,
+                logo1: 'https://placehold.co/100x100/111827/f43f5e?text=BTR',
+                logo2: 'https://placehold.co/100x100/111827/38bdf8?text=EVOS'
+            }
+        ];
+
+        let activeUploadMatchTarget = null;
+
+        function triggerMatchLogoUpload(index, side) {
+            activeUploadMatchTarget = { index, side };
+            triggerUpload('input-dynamic-match-logo');
+        }
+
+        function handleDynamicMatchLogoUpload(inputElement) {
+            const file = inputElement.files && inputElement.files[0];
+            if (!file || !activeUploadMatchTarget) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const { index, side } = activeUploadMatchTarget;
+                if (matchesData[index] && e.target && e.target.result) {
+                    matchesData[index][side] = e.target.result;
+                    renderAllMatches();
+                }
+            };
+            reader.readAsDataURL(file);
+            inputElement.value = '';
+        }
+
+        function addNewMatch() {
+            const nextNum = matchesData.length + 1;
+            matchesData.push({
+                id: Date.now() + Math.random(),
+                title: `MATCH ${nextNum} | BO5`,
+                time: '21:00 WIB',
+                score1: 0,
+                score2: 0,
+                logo1: `https://placehold.co/100x100/111827/a855f7?text=TIM+${nextNum}A`,
+                logo2: `https://placehold.co/100x100/111827/10b981?text=TIM+${nextNum}B`
+            });
+            renderAllMatches();
+        }
+
+        function removeMatch(index) {
+            if (matchesData.length <= 1) return;
+            matchesData.splice(index, 1);
+            renderAllMatches();
+        }
+
+        function updateMatchField(index, field, value) {
+            if (!matchesData[index]) return;
+            matchesData[index][field] = value;
+            renderOverlayMatchesOnly();
+        }
+
+        function renderOverlayMatchesOnly() {
+            const container = document.getElementById('matches-overlay-container');
+            if (!container) return;
+            const isCompact = matchesData.length >= 3;
+            const heightClass = isCompact ? 'h-20 sm:h-22' : 'h-24 sm:h-28';
+            const logoMaxH = isCompact ? 'max-h-12 sm:max-h-14' : 'max-h-16 sm:max-h-20';
+            const scoreSize = isCompact ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl';
+            const vsSize = isCompact ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl';
+
+            container.innerHTML = matchesData.map((m, idx) => `
+                <div class="bg-[#0e1324]/90 border border-white/10 shadow-xl grid grid-cols-12 items-center ${heightClass} overflow-hidden transition-all">
+                    <div class="col-span-3 h-full bg-black/30 flex items-center justify-center p-2 cursor-pointer group relative" onclick="triggerMatchLogoUpload(${idx}, 'logo1')" title="Klik untuk ganti logo tim kiri">
+                        <img src="${m.logo1}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/111827/ef4444?text=T1';" alt="Tim 1" class="${logoMaxH} max-w-full object-contain">
+                        <span class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] font-bold">Logo</span>
+                    </div>
+                    <div class="col-span-6 h-full flex items-center justify-between px-3 sm:px-5 bg-gradient-to-r from-black/20 via-indigo-950/30 to-black/20">
+                        <span class="font-['Anton'] ${scoreSize} text-white">${m.score1}</span>
+                        <div class="flex flex-col items-center text-center">
+                            <span class="text-[10px] sm:text-xs font-bold tracking-widest text-slate-300 uppercase">${m.title}</span>
+                            <span class="font-['Anton'] ${vsSize} text-[#f4c07a] leading-none my-0.5">VS</span>
+                            <span class="text-[10px] sm:text-xs font-bold tracking-wider text-slate-300">${m.time}</span>
+                        </div>
+                        <span class="font-['Anton'] ${scoreSize} text-white">${m.score2}</span>
+                    </div>
+                    <div class="col-span-3 h-full bg-black/30 flex items-center justify-center p-2 cursor-pointer group relative" onclick="triggerMatchLogoUpload(${idx}, 'logo2')" title="Klik untuk ganti logo tim kanan">
+                        <img src="${m.logo2}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/111827/38bdf8?text=T2';" alt="Tim 2" class="${logoMaxH} max-w-full object-contain">
+                        <span class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] font-bold">Logo</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderEditorMatchesList() {
+            const listEl = document.getElementById('editor-matches-list');
+            const badgeEl = document.getElementById('match-count-badge');
+            if (badgeEl) badgeEl.textContent = matchesData.length;
+            if (!listEl) return;
+
+            listEl.innerHTML = matchesData.map((m, idx) => `
+                <div class="space-y-2.5 bg-white/5 p-3.5 rounded-2xl border border-white/10">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold uppercase text-sky-400">Pertandingan #${idx + 1}</h4>
+                        ${matchesData.length > 1 ? `
+                            <button type="button" onclick="removeMatch(${idx})" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-0.5 rounded bg-rose-500/10">
+                                <i class="fa-solid fa-trash-can mr-1"></i>Hapus
+                            </button>
+                        ` : '<span class="text-[10px] text-slate-500">Minimal 1 Match</span>'}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" value="${String(m.title).replace(/"/g, '&quot;')}" oninput="updateMatchField(${idx}, 'title', this.value)" class="bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs">
+                        <input type="text" value="${String(m.time).replace(/"/g, '&quot;')}" oninput="updateMatchField(${idx}, 'time', this.value)" class="bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 items-center">
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="triggerMatchLogoUpload(${idx}, 'logo1')" class="flex-1 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-image text-amber-400"></i> Logo Kiri
+                            </button>
+                            <input type="number" value="${m.score1}" min="0" oninput="updateMatchField(${idx}, 'score1', this.value)" class="w-12 bg-black/40 border border-white/15 rounded-lg py-1.5 text-center font-bold text-xs">
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <input type="number" value="${m.score2}" min="0" oninput="updateMatchField(${idx}, 'score2', this.value)" class="w-12 bg-black/40 border border-white/15 rounded-lg py-1.5 text-center font-bold text-xs">
+                            <button type="button" onclick="triggerMatchLogoUpload(${idx}, 'logo2')" class="flex-1 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-image text-sky-400"></i> Logo Kanan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAllMatches() {
+            renderOverlayMatchesOnly();
+            renderEditorMatchesList();
+        }
+
+        // Manajemen Multi-Banner / Multi-Video
+        let bannerLayout = 'vertical';
+        let bannersData = [
+            {
+                id: 1,
+                mediaType: 'image',
+                src: 'https://placehold.co/1280x720/111827/f4c07a?text=KLIK+UNTUK+UPLOAD+FOTO+ATAU+VIDEO+(MP4)',
+                title: 'LANCELOT "GUARDIAN OF THE SHRINE"',
+                sub: 'SKIN MAGICAL BARU',
+                muted: true
+            }
+        ];
+        let activeUploadBannerIndex = null;
+
+        function setBannerLayout(layout) {
+            bannerLayout = layout;
+            const vBtn = document.getElementById('btn-layout-vertical');
+            const gBtn = document.getElementById('btn-layout-grid');
+            if (layout === 'vertical') {
+                if (vBtn) vBtn.className = 'py-1.5 px-2 rounded-lg bg-sky-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5';
+                if (gBtn) gBtn.className = 'py-1.5 px-2 rounded-lg bg-white/10 text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5';
+            } else {
+                if (gBtn) gBtn.className = 'py-1.5 px-2 rounded-lg bg-sky-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5';
+                if (vBtn) vBtn.className = 'py-1.5 px-2 rounded-lg bg-white/10 text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5';
+            }
+            renderOverlayBannersOnly();
+        }
+
+        function triggerBannerMediaUpload(index) {
+            activeUploadBannerIndex = index;
+            triggerUpload('input-dynamic-banner-media');
+        }
+
+        function handleDynamicBannerMediaUpload(inputElement) {
+            try {
+                const file = inputElement.files && inputElement.files[0];
+                const idx = activeUploadBannerIndex;
+                if (!file || idx === null || idx === undefined || !bannersData[idx]) {
+                    inputElement.value = '';
+                    return;
+                }
+
+                const fileName = (file.name || '').toLowerCase();
+                const isVideo = (file.type && file.type.startsWith('video/')) ||
+                    /\.(mp4|webm|ogg|mov|m4v|avi|mkv)$/i.test(fileName);
+
+                if (bannersData[idx].src && bannersData[idx].src.startsWith('blob:')) {
+                    try { URL.revokeObjectURL(bannersData[idx].src); } catch (e) {}
+                }
+
+                if (isVideo) {
+                    bannersData[idx].mediaType = 'video';
+                    bannersData[idx].src = URL.createObjectURL(file);
+                    renderAllBanners();
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (bannersData[idx] && e.target && e.target.result) {
+                            bannersData[idx].mediaType = 'image';
+                            bannersData[idx].src = e.target.result;
+                            renderAllBanners();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            } catch (err) {
+                console.error('Banner media upload error:', err);
+            } finally {
+                activeUploadBannerIndex = null;
+                inputElement.value = '';
+            }
+        }
+
+        function addNewBanner() {
+            const nextNum = bannersData.length + 1;
+            bannersData.push({
+                id: Date.now() + Math.random(),
+                mediaType: 'image',
+                src: `https://placehold.co/1280x720/0f172a/38bdf8?text=BANNER+%2F+VIDEO+%23${nextNum}+(KLIK+UPLOAD)`,
+                title: `PROMO & HIGHLIGHT #${nextNum}`,
+                sub: 'TOURNAMENT BY ARTHES',
+                muted: true
+            });
+            renderAllBanners();
+        }
+
+        function removeBanner(index) {
+            if (bannersData.length <= 1) return;
+            if (bannersData[index]?.src?.startsWith('blob:')) {
+                try { URL.revokeObjectURL(bannersData[index].src); } catch (e) {}
+            }
+            bannersData.splice(index, 1);
+            renderAllBanners();
+        }
+
+        function updateBannerField(index, field, value) {
+            if (!bannersData[index]) return;
+            bannersData[index][field] = value;
+            renderOverlayBannersOnly();
+        }
+
+        function renderOverlayBannersOnly() {
+            const container = document.getElementById('banners-overlay-container');
+            if (!container) return;
+            const count = bannersData.length;
+
+            if (bannerLayout === 'grid' && count > 1) {
+                container.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3 w-full';
+            } else {
+                container.className = 'flex flex-col gap-3 w-full';
+            }
+
+            let heightClass = 'aspect-video min-h-[180px]';
+            if (bannerLayout === 'vertical') {
+                if (count === 2) heightClass = 'min-h-[170px] sm:min-h-[195px] aspect-video max-h-[240px]';
+                else if (count >= 3) heightClass = 'min-h-[125px] sm:min-h-[140px] aspect-video max-h-[175px]';
+            } else if (bannerLayout === 'grid' && count >= 3) {
+                heightClass = 'min-h-[145px] sm:min-h-[165px] aspect-video';
+            }
+
+            container.innerHTML = bannersData.map((b, idx) => {
+                const hasCaption = (b.title && b.title.trim() !== '') || (b.sub && b.sub.trim() !== '');
+                const titleSize = count >= 3 ? 'text-sm sm:text-base' : (count === 2 ? 'text-base sm:text-xl' : 'text-xl sm:text-3xl');
+                const subSize = count >= 3 ? 'text-xs' : (count === 2 ? 'text-xs sm:text-sm' : 'text-base sm:text-xl');
+                const safeSrc = b.src || `https://placehold.co/1280x720/0f172a/38bdf8?text=BANNER+%23${idx + 1}`;
+
+                return `
+                <div data-banner-slot="${idx}" class="relative w-full ${heightClass} border border-[#f4c07a]/60 bg-slate-950/90 shadow-2xl overflow-hidden group cursor-pointer transition-all"
+                     onclick="triggerBannerMediaUpload(${idx})"
+                     title="Klik untuk upload foto atau video ke slot #${idx + 1}">
+                    ${b.mediaType === 'video' ? `
+                        <video src="${safeSrc}" autoplay loop ${b.muted ? 'muted' : ''} playsinline class="w-full h-full object-cover"></video>
+                    ` : `
+                        <img src="${safeSrc}" alt="Banner ${idx + 1}" onerror="this.onerror=null;this.src='https://placehold.co/1280x720/0f172a/38bdf8?text=BANNER+%23${idx + 1}';" class="w-full h-full object-cover">
+                    `}
+                    ${hasCaption ? `
+                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent p-2 sm:p-3.5 text-center pointer-events-none">
+                            ${b.title ? `<h2 class="font-['Oswald'] font-bold ${titleSize} tracking-wider uppercase text-white drop-shadow-md leading-tight">${b.title}</h2>` : ''}
+                            ${b.sub ? `<p class="font-['Oswald'] font-semibold ${subSize} tracking-widest uppercase text-amber-300 leading-tight">${b.sub}</p>` : ''}
+                        </div>
+                    ` : ''}
+                    <div class="absolute top-2 right-2 bg-black/85 text-white text-xs px-2.5 py-1 rounded-lg border border-white/20 opacity-0 group-hover:opacity-100 transition flex items-center gap-1.5 z-10">
+                        <i class="fa-solid fa-cloud-arrow-up text-amber-400"></i>
+                        <span>Upload Foto/Video</span>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            container.querySelectorAll('video').forEach(vid => {
+                try { vid.play().catch(() => {}); } catch (e) {}
+            });
+        }
+
+        function renderEditorBannersList() {
+            const listEl = document.getElementById('editor-banners-list');
+            const badgeEl = document.getElementById('banner-count-badge');
+            if (badgeEl) badgeEl.textContent = bannersData.length;
+            if (!listEl) return;
+
+            listEl.innerHTML = bannersData.map((b, idx) => `
+                <div class="space-y-2 bg-black/35 p-3 rounded-xl border border-white/10">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-300">Slot #${idx + 1} (${b.mediaType === 'video' ? 'Video' : 'Gambar'})</span>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="triggerBannerMediaUpload(${idx})" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-file-video"></i> Foto/Video
+                            </button>
+                            ${bannersData.length > 1 ? `
+                                <button type="button" onclick="removeBanner(${idx})" class="px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[11px]">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <input type="text" value="${String(b.title || '').replace(/"/g, '&quot;')}" oninput="updateBannerField(${idx}, 'title', this.value)" placeholder="Judul Overlay" class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs">
+                    <input type="text" value="${String(b.sub || '').replace(/"/g, '&quot;')}" oninput="updateBannerField(${idx}, 'sub', this.value)" placeholder="Subjudul Overlay" class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs">
+                    ${b.mediaType === 'video' ? `
+                        <label class="flex items-center gap-2 text-[11px] text-slate-300 pt-1 cursor-pointer">
+                            <input type="checkbox" ${b.muted ? 'checked' : ''} onchange="updateBannerField(${idx}, 'muted', this.checked)" class="accent-amber-500">
+                            <span>Bisukan Suara Video (Mute)</span>
+                        </label>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderAllBanners() {
+            renderOverlayBannersOnly();
+            renderEditorBannersList();
+        }
+
+        function toggleSocialVisibility() {
+            const show = document.getElementById('toggle-social-bar')?.checked ?? true;
+            const bar = document.getElementById('social-media-bar');
+            if (bar) bar.classList.toggle('hidden', !show);
+        }
+
+        // Atur Ukuran & Posisi (X, Y) Semua Teks
+        const textConfigs = [
+            { key: 'evSub', label: 'Subjudul Event', selector: '#display-event-sub', size: 14, x: 0, y: 0, minSize: 8, maxSize: 48 },
+            { key: 'evTitle', label: 'Judul Event Utama', selector: '#display-event-title', size: 48, x: 0, y: 0, minSize: 18, maxSize: 96 },
+            { key: 'evLoc', label: 'Lokasi Event', selector: '#display-event-loc', size: 12, x: 0, y: 0, minSize: 8, maxSize: 40 },
+            { key: 'panelLabel', label: 'Label PANELIST', selector: '#display-panelist-label', size: 14, x: 0, y: 0, minSize: 9, maxSize: 36 },
+            { key: 'p1', label: 'Nama Panelis 1', selector: '#name-panelist-1', size: 14, x: 0, y: 0, minSize: 9, maxSize: 36 },
+            { key: 'p2', label: 'Nama Panelis 2', selector: '#name-panelist-2', size: 14, x: 0, y: 0, minSize: 9, maxSize: 36 },
+            { key: 'p3', label: 'Nama Panelis 3', selector: '#name-panelist-3', size: 14, x: 0, y: 0, minSize: 9, maxSize: 36 },
+            { key: 'commUser', label: 'Username Komentar', selector: '#display-comment-user', size: 12, x: 0, y: 0, minSize: 9, maxSize: 32 },
+            { key: 'commText', label: 'Teks Komentar Berjalan', selector: '#display-comment-text', size: 16, x: 0, y: 0, minSize: 10, maxSize: 44 },
+            { key: 'hashtag', label: 'Slogan / Hashtag Bawah', selector: '#display-hashtag', size: 30, x: 0, y: 0, minSize: 12, maxSize: 72 },
+            { key: 'brand', label: 'Teks Base Brand', selector: '#display-base-brand', size: 14, x: 0, y: 0, minSize: 9, maxSize: 40 },
+            { key: 'wa', label: 'Teks WhatsApp', selector: '#display-wa-text', size: 14, x: 0, y: 0, minSize: 9, maxSize: 40 },
+            { key: 'ig', label: 'Teks Instagram', selector: '#display-ig-text', size: 14, x: 0, y: 0, minSize: 9, maxSize: 40 }
+        ];
+
+        function applySingleTextTransform(cfg) {
+            const el = document.querySelector(cfg.selector);
+            if (!el) return;
+            el.style.fontSize = `${cfg.size}px`;
+            el.style.transform = `translate(${cfg.x}px, ${cfg.y}px)`;
+        }
+
+        function applyAllTextTransforms() {
+            textConfigs.forEach(applySingleTextTransform);
+        }
+
+        function updateTextConfig(key, field, val) {
+            const cfg = textConfigs.find(item => item.key === key);
+            if (!cfg) return;
+            cfg[field] = parseInt(val, 10) || 0;
+            applySingleTextTransform(cfg);
+
+            const labelEl = document.getElementById(`val-${key}-${field}`);
+            if (labelEl) {
+                labelEl.textContent = field === 'size' ? `${cfg.size}px` : `${cfg[field]}px`;
+            }
+        }
+
+        function resetSingleTextTransform(key) {
+            const cfg = textConfigs.find(item => item.key === key);
+            if (!cfg) return;
+            cfg.x = 0;
+            cfg.y = 0;
+            applySingleTextTransform(cfg);
+            renderTextControlsList();
+        }
+
+        function resetAllTextTransforms() {
+            textConfigs.forEach(cfg => {
+                cfg.x = 0;
+                cfg.y = 0;
+            });
+            applyAllTextTransforms();
+            renderTextControlsList();
+        }
+
+        function renderTextControlsList() {
+            const listEl = document.getElementById('text-controls-list');
+            if (!listEl) return;
+
+            listEl.innerHTML = textConfigs.map(cfg => `
+                <div class="bg-white/5 p-3 rounded-2xl border border-white/10 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-sky-300">${cfg.label}</span>
+                        <button type="button" onclick="resetSingleTextTransform('${cfg.key}')" class="text-[10px] px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-slate-300">
+                            Reset Posisi
+                        </button>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[11px] text-slate-300">
+                            <span>Ukuran Font</span>
+                            <span id="val-${cfg.key}-size" class="font-mono text-amber-400">${cfg.size}px</span>
+                        </div>
+                        <input type="range" min="${cfg.minSize}" max="${cfg.maxSize}" value="${cfg.size}"
+                               oninput="updateTextConfig('${cfg.key}', 'size', this.value)"
+                               class="w-full mt-1 accent-amber-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <div class="flex justify-between text-[11px] text-slate-300">
+                                <span>Posisi X</span>
+                                <span id="val-${cfg.key}-x" class="font-mono text-emerald-400">${cfg.x}px</span>
+                            </div>
+                            <input type="range" min="-250" max="250" value="${cfg.x}"
+                                   oninput="updateTextConfig('${cfg.key}', 'x', this.value)"
+                                   class="w-full mt-1 accent-emerald-500">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[11px] text-slate-300">
+                                <span>Posisi Y</span>
+                                <span id="val-${cfg.key}-y" class="font-mono text-sky-400">${cfg.y}px</span>
+                            </div>
+                            <input type="range" min="-200" max="200" value="${cfg.y}"
+                                   oninput="updateTextConfig('${cfg.key}', 'y', this.value)"
+                                   class="w-full mt-1 accent-sky-500">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Sinkronisasi Teks Real-Time
+        function getInputValue(id, fallback = '') {
+            const el = document.getElementById(id);
+            return el && typeof el.value === 'string' ? el.value : fallback;
+        }
+
+        function setElementText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        function syncTexts() {
+            setElementText('display-panelist-label', getInputValue('ed-panel-label', 'PANELIST') || 'PANELIST');
+            setElementText('name-panelist-1', getInputValue('ed-p1-name', 'NEVINNE'));
+            setElementText('name-panelist-2', getInputValue('ed-p2-name', 'OM WAWA'));
+            setElementText('name-panelist-3', getInputValue('ed-p3-name', 'TALITHA'));
+
+            setElementText('display-event-sub', getInputValue('ed-ev-sub', 'MPL ID S18'));
+            setElementText('display-event-title', getInputValue('ed-ev-title', 'PLAYOFFS'));
+            setElementText('display-event-loc', getInputValue('ed-ev-loc', 'SURABAYA'));
+            setElementText('display-hashtag', getInputValue('ed-hashtag', 'WEOWNTHIS'));
+            setElementText('display-base-brand-text', getInputValue('ed-base-brand', 'TOURNAMENT BY ARTHES'));
+
+            const waVal = getInputValue('ed-wa-text', '0812-3456-7890').trim();
+            const igVal = getInputValue('ed-ig-text', '@arthes.tournament').trim();
+            setElementText('display-wa-value', waVal);
+            setElementText('display-ig-value', igVal);
+
+            const waWrap = document.getElementById('display-wa-text');
+            const igWrap = document.getElementById('display-ig-text');
+            if (waWrap) waWrap.classList.toggle('hidden', !waVal);
+            if (igWrap) igWrap.classList.toggle('hidden', !igVal);
+
+            setElementText('display-comment-user', getInputValue('ed-comm-user', '@heylul96'));
+            setElementText('display-comment-text', getInputValue('ed-comm-text', 'AE bisa yukkk. Semangat terus buat semua tim di Playoffs Surabaya! #WEOWNTHIS'));
+        }
+
+        // Kontrol Drawer & Tab
+        function toggleEditorDrawer() {
+            const drawer = document.getElementById('editor-drawer');
+            if (drawer) drawer.classList.toggle('translate-x-full');
+        }
+
+        function switchEditorTab(tabId) {
+            ['tab-timer', 'tab-panel', 'tab-media', 'tab-texts'].forEach(id => {
+                const tab = document.getElementById(id);
+                if (tab) tab.classList.add('hidden');
+            });
+            ['btn-tab-timer', 'btn-tab-panel', 'btn-tab-media', 'btn-tab-texts'].forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.classList.remove('border-amber-400', 'text-amber-400');
+                    btn.classList.add('border-transparent', 'text-slate-400');
+                }
+            });
+
+            const activeTab = document.getElementById(tabId);
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeTab) activeTab.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.classList.add('border-amber-400', 'text-amber-400');
+                activeBtn.classList.remove('border-transparent', 'text-slate-400');
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.altKey) && e.key.toLowerCase() === 'e') {
+                e.preventDefault();
+                toggleEditorDrawer();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                renderAllMatches();
+                renderAllBanners();
+                renderTextControlsList();
+                applyAllTextTransforms();
+                syncTexts();
+                renderClock();
+                exportPresetToBox();
+                if (window.innerWidth < 640) {
+                    const sizeInput = document.getElementById('ed-font-size');
+                    if (sizeInput) {
+                        sizeInput.value = 82;
+                        updateClockStyle();
+                    }
+                }
+            } catch (err) {
+                console.error('Initialization error:', err);
+            }
+        });
+    </script>
+
+<style id="hk-css"></style>
+<script>
+/* ===== Integrasi panel gabungan: ?edit = editor di panel, ?view = tampilan siaran. Tanpa parameter = perilaku asli ===== */
+(()=>{const P=new URLSearchParams(location.search),ED=P.has('edit'),VW=P.has('view');if(!ED&&!VW)return;
+const C=new BroadcastChannel('lobby3'),O={start:startClock,pause:pauseClock,reset:resetClock};
+document.getElementById('hk-css').textContent='#secret-settings-hotspot{display:none!important}'+(VW?'#editor-drawer{display:none!important}body{overflow:hidden}':'#editor-drawer{transform:none!important}');
+const db=()=>new Promise(r=>{const q=indexedDB.open('stg',1);q.onupgradeneeded=()=>q.result.createObjectStore('f');q.onsuccess=()=>r(q.result)});
+const idbPut=async v=>{const d=await db();d.transaction('f','readwrite').objectStore('f').put(v,'lobby')};
+const idbGet=async()=>{const d=await db();return new Promise(r=>{const q=d.transaction('f').objectStore('f').get('lobby');q.onsuccess=()=>r(q.result)})};
+if(ED){
+ ['start','pause','reset'].forEach(c=>{const n=c+'Clock',o=window[n];window[n]=function(){o.apply(this,arguments);C.postMessage({t:'cmd',c})}});
+ const bc={};const du=async u=>{if(!u||!u.startsWith('blob:'))return u;if(bc[u])return bc[u];const b=await (await fetch(u)).blob();return bc[u]=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)})};
+ let last='',busy=0;async function push(){if(busy)return;busy=1;try{const p=buildVisualPreset();for(let i=0;i<p.banners.length;i++)p.banners[i].src=await du(bannersData[i].src)||p.banners[i].src;
+  const s=JSON.stringify(p);if(s!==last){last=s;C.postMessage({t:'preset',p});idbPut(p)}}catch(e){console.error(e)}busy=0}
+ let tm;['input','change','click'].forEach(e=>document.addEventListener(e,()=>{clearTimeout(tm);tm=setTimeout(push,400)},true));setInterval(push,2000);
+ C.onmessage=e=>{const d=e.data;if(d.t=='cmd')O[d.c]()};
+ setTimeout(async()=>{const p=await idbGet();if(p){applyPresetObject(p)}push()},400);
+}else{
+ let lk='';const ap=p=>{const k=JSON.stringify([p.clock.mode,p.clock.minutes,p.clock.seconds]),run=isRunning,cs=currentSeconds;applyPresetObject(p);if(k===lk){currentSeconds=cs;renderClock();run&&startClock()}lk=k};
+ C.onmessage=e=>{const d=e.data;if(d.t=='preset')ap(d.p);else if(d.t=='cmd')O[d.c]()};
+ setTimeout(async()=>{const p=await idbGet();if(p)ap(p)},400);
+}})();
+</script>
+</body>
+</html>
