@@ -34,8 +34,8 @@ ${inp(p+'.title','Judul')}${inp(p+'.sub','Subjudul')}${sel(p+'.anim','Gerak teks
 function stUI(){const ids=[...Array(+S.nl).keys(),...[...Array(+S.nr).keys()].map(j=>j+3)];return`<fieldset><legend>Kotak Konten (default 1 kiri + 1 kanan)</legend><div class="gr">${sel('nl','Jumlah kotak kiri (ditumpuk)',{1:'1',2:'2',3:'3'})}${sel('nr','Jumlah kotak kanan (ditumpuk)',{1:'1',2:'2',3:'3'})}${inp('wl','Lebar kolom kiri (%)','number','min=30 max=70')}${inp('ts','Durasi 1 putaran running text (detik)','number','min=3')}</div><div class="row"><button data-rp="1">↻ Ulangi animasi teks</button></div></fieldset>
 ${ids.map(boxUI).join('')}
 <fieldset><legend>Komentar Penonton</legend><div class="gr">${chk('cm.on','Tampilkan bar komentar')}${inp('cm.user','Nama / @username')}${inp('cm.text','Isi komentar')}${inp('cm.sp','Durasi 1 putaran (detik)','number','min=3')}</div></fieldset>
-<fieldset><legend>Timer / Stopwatch Panggung</legend><div class="gr">${chk('tm.on','Tampilkan')}${sel('tm.mode','Mode',{down:'Timer mundur',up:'Stopwatch (maju)'})}${sel('tm.style','Model tampilan',{badge:'Badge emas',neon:'Neon glow',digital:'Digital',pill:'Kapsul',slant:'Miring (esports)',flip:'Kartu flip',minimal:'Minimalis',bar:'Bar progres',ring:'Lingkaran progres'})}${sel('tm.pos','Posisi',{tl:'Kiri atas',tc:'Tengah atas',tr:'Kanan atas'})}${inp('tm.label','Label')}${inp('tm.sz','Ukuran (%)','number','min=40 max=250')}${S.tm.mode=='down'?inp('tm.dur','Durasi (detik)','number','min=1'):''}${inp('tm.col','Warna angka','color')}${chk('tm.ds','Tampilkan 0,1 detik')}</div>
-<div class="row"><button class="pri" data-t="start">▶ Start</button><button data-t="stop">⏸ Stop</button><button data-t="reset">⟲ Reset</button>${S.tm.mode=='down'?'<button data-d="30">0:30</button><button data-d="60">1:00</button><button data-d="300">5:00</button><button data-d="600">10:00</button>':''}</div></fieldset>
+<fieldset><legend>Timer Panggung</legend><div class="gr">${chk('tm.on','Tampilkan timer')}${sel('tm.pos','Posisi',{tl:'Kiri atas',tc:'Tengah atas',tr:'Kanan atas'})}${inp('tm.label','Label')}${inp('tm.dur','Durasi (detik)','number','min=1')}${inp('tm.col','Warna angka','color')}</div>
+<div class="row"><button class="pri" data-t="start">▶ Start</button><button data-t="stop">⏸ Stop</button><button data-t="reset">⟲ Reset</button><button data-d="30">0:30</button><button data-d="60">1:00</button><button data-d="300">5:00</button><button data-d="600">10:00</button></div></fieldset>
 <fieldset><legend>Background</legend><div class="gr">${sel('bg.t','Jenis',{none:'Transparan (untuk OBS)',color:'Warna solid',anim:'Animasi',media:'Upload gambar / video'})}${S.bg.t=='anim'?sel('bg.an','Animasi',{aurora:'Aurora bergerak',gradient:'Gradasi bergeser',pulse:'Berdenyut',grid:'Grid berjalan'}):''}${S.bg.t=='media'?`<label>Upload background<input type="file" accept="image/*,video/*" data-bgup="1"></label>`:''}${inp('bg.c1','Warna 1','color')}${S.bg.t=='anim'?inp('bg.c2','Warna 2','color'):''}</div></fieldset>
 <fieldset><legend>Warna Bingkai</legend><div class="gr">${inp('th.ac','Aksen / bar komentar','color')}${inp('th.bd','Garis bingkai','color')}${inp('th.pn','Panel gelap','color')}</div><div class="row"><button data-th='{"ac":"#f5c06f","bd":"#d4ab4c","pn":"#111827"}'>Preset Emas–Navy (referensi)</button><button data-th='{"ac":"#ff3b3b","bd":"#e32b2b","pn":"#1a0d10"}'>Preset Merah</button></div></fieldset>`}
 const LC=new BroadcastChannel('lobby3');
@@ -47,15 +47,12 @@ addEventListener('change',async e=>{const t=e.target,d=t.dataset;
  if(d.up!==undefined&&t.files[0]){const f=t.files[0],k='f'+Date.now(),b=S.boxes[d.up];await put(k,f);b.key=k;b.type=f.type.startsWith('video')?'video':'img';sv();return draw()}
  if(d.bgup&&t.files[0]){const f=t.files[0],k='bg'+Date.now();await put(k,f);S.bg.key=k;S.bg.mt=f.type.startsWith('video')?'video':'img';sv();return draw()}
  if(!d.k)return;let v=t.type=='checkbox'?t.checked:t.type=='number'?Math.max(1,+t.value||1):t.value;if(/^n[lr]$/.test(d.k))v=+t.value;sp(d.k,v);
- if(d.k=='tm.mode'){S.tm.left=v=='up'?0:S.tm.dur;S.tm.run=false}if(d.k=='tm.dur'&&!S.tm.run)S.tm.left=v;sv();if(/\.type$|^n[lr]$|\.anim$|^bg\.t$|^tm\.mode$/.test(d.k))draw()});
+ if(d.k=='tm.dur'&&!S.tm.run)S.tm.left=v;sv();if(/\.type$|^n[lr]$|\.anim$|^bg\.t$/.test(d.k))draw()});
 addEventListener('input',e=>{const d=e.target.dataset;if(d.k&&/text|color/.test(e.target.type)){sp(d.k,e.target.value);sv()}});
 addEventListener('click',e=>{const t=e.target,d=t.dataset,T=S.tm;
  if(d.v){V=d.v;draw()}if(d.go){S.sc.cur=d.go;sv();scDraw()}if(d.lc)LC.postMessage({t:'cmd',c:d.lc});if(d.cap!==undefined)$('#ov').contentWindow.cap(+d.cap);if(d.rp){S.rp=Date.now();sv()}
  if(d.th){Object.assign(S.th,JSON.parse(d.th));sv();draw()}
  if(d.d){T.dur=+d.d;if(!T.run)T.left=T.dur;sv();draw()}
- if(d.t){const up=T.mode=='up',now=Date.now();
-  if(d.t=='start'){if(!T.run){if(up)T.st=now;else{if(!T.left)T.left=T.dur;T.end=now+T.left*1000}T.run=true}}
-  else if(d.t=='stop'){if(T.run)T.left=up?T.left+(now-T.st)/1000:Math.max(0,Math.ceil((T.end-now)/1000));T.run=false}
-  else{T.left=up?0:T.dur;T.run=false}sv()}});
+ if(d.t){if(d.t=='start'){if(!T.left)T.left=T.dur;T.end=Date.now()+T.left*1000;T.run=true}else if(d.t=='stop'){if(T.run)T.left=Math.max(0,Math.ceil((T.end-Date.now())/1000));T.run=false}else{T.left=T.dur;T.run=false}sv()}});
 draw();ch&&(ch.onmessage=e=>{S=e.data;V=='st'&&draw()});
 </script></body></html>
