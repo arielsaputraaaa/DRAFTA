@@ -60,7 +60,7 @@ body.ctl{overflow:auto;background:#161820;color:#eee;font:14px Arial;padding:16p
 #cp button{padding:6px 12px;margin:4px 4px 0 0;background:#3b6cf6;color:#fff;border:0;border-radius:4px;cursor:pointer}#cp button.r{background:#c33}#cp .sc{font-size:22px;margin:6px 0}#cp .sc b{display:inline-block;min-width:36px;text-align:center}
 #cp .tabs{display:flex;gap:6px;margin-bottom:12px}#cp .tabs button{background:#2a2d36;margin:0;padding:9px 16px}#cp .tabs button.on{background:#d4ab4c;color:#000;font-weight:700}
 .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}.st{padding:6px 8px;border-radius:6px;background:#23262f;border:1px solid #444}.st.A.done{border-color:#2a6cf0}.st.B.done{border-color:#d6303c}.st.cur{outline:2px solid #f9eaa8;background:#3a3420}.st small{display:block;color:#9ab;font-size:11px}.big{font-size:20px;color:#f9eaa8;margin:4px 0}
-</style></head><body>
+html.lite *,html.lite *:before,html.lite *:after{animation-iteration-count:1!important}</style></head><body>
 <div id="stage"><div id="bar"><div class="side" id="A"></div>
 <div id="C"><img id="lg"><div id="tn"></div><div id="st"></div>
 <div class="bt"><div class="tl" id="lA"></div><div class="mc"><div class="row"><span class="ar" id="ta"></span><div id="tm">0:00</div><span class="ar" id="tb"></span></div><div id="sc"></div></div><div class="tl" id="lB"></div></div></div>
@@ -71,7 +71,7 @@ const HEROES=["aamon","akai","aldous","alice","alpha","alucard","angela","argus"
 const ORDER=[["A","b",0],["B","b",0],["A","b",1],["B","b",1],["A","b",2],["B","b",2],["A","p",0],["B","p",0,2],["A","p",1,2],["B","p",2],["A","b",3],["B","b",3],["A","b",4],["B","b",4],["B","p",3],["A","p",3,2],["B","p",4]];
 const fld=y=>y==="b"?"bn":"pk",idl=v=>!v||v==="idle",slots=o=>Array.from({length:o[3]||1},(_,j)=>o[2]+j),curStep=()=>ORDER.find(o=>slots(o).some(i=>idl(S[o[0]][fld(o[1])][i])));
 const stepTxt=()=>{const c=curStep();if(!c)return"Draft selesai ✔";return`Langkah ${ORDER.indexOf(c)+1}/${ORDER.length} → Tim ${c[0]==="A"?"BIRU (kiri)":"MERAH (kanan)"} ${c[1]==="b"?"BAN":"PICK"} ${slots(c).map(i=>i+1).join(" & ")}`};
-const KEY="dp2",ch="BroadcastChannel"in window?new BroadcastChannel("dp2"):null;
+const LITE=new URLSearchParams(location.search).has("lite");LITE&&document.documentElement.classList.add("lite");const KEY="dp2",ch="BroadcastChannel"in window?new BroadcastChannel("dp2"):null;
 const blank=n=>({n,sub:"",logo:"",ava:"",pl:["Player 1","Player 2","Player 3","Player 4","Player 5"],pk:Array(5).fill(""),bn:Array(5).fill(""),sc:0});
 const def=()=>({tour:"TOURNAMENT BY ARTHES",stage:"Lower Bracket Finals Game 6",mid:"logo.png",max:3,auto:true,live:true,anim:1.8,snd:{on:true,vol:.7},bg:{t:"none",c:"#0a0f1e",img:""},turn:"",timer:{bd:30,pd:30,left:30,end:0,run:false},A:{...blank("RRQ Hoshi"),col:"#1f5fd6"},B:{...blank("Team Liquid ID"),col:"#c8283a"}});
 function mg(d,s){if(s)for(const k in d){if(k in s){if(d[k]&&typeof d[k]==="object"&&!Array.isArray(d[k]))mg(d[k],s[k]);else d[k]=s[k]}}return d}
@@ -100,7 +100,7 @@ function fit(){const k=innerWidth/1920,s=$("#stage").style;s.height=innerHeight/
 const prev={A:{pk:[],bn:[]},B:{pk:[],bn:[]}};
 function build(id){const hs='<svg class="hs" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10v6a3 3 0 0 0 3 3h2v-8H5v-1a7 7 0 0 1 14 0v1h-2v8h2a3 3 0 0 0 3-3v-6A10 10 0 0 0 12 2z"/></svg>';
  $("#"+id).innerHTML=`<div class="top"><div class="tm">${hs}<img class="ava"><div class="nb"><b class="tn"></b><i class="sb"></i></div></div><div class="bans">${'<div class="b"><img class="hp"><img class="x" src="Ban.png"></div>'.repeat(5)}</div></div><div class="pks">${'<div class="s idle"><div class="art"><img class="lg"><div class="hn"><span></span></div></div></div>'.repeat(5)}</div><div class="pn">${"<div></div>".repeat(5)}</div>`}
-function mkimg(art,src,name){const o=$(".hero,.fb",art);o&&o.remove();if(!src)return;const i=new Image();i.className="hero";i.src=src;i.onerror=()=>{i.remove();const d=document.createElement("div");d.className="fb";d.textContent=name;art.prepend(d)};art.prepend(i)}
+function mkimg(art,src,name){const o=$(".hero,.fb",art);o&&o.remove();const t=art._t=(art._t||0)+1;if(!src)return;const i=new Image(),add=()=>{art._t===t&&art.prepend(i)};i.className="hero";i.onerror=()=>{if(art._t!==t)return;i.remove();const d=document.createElement("div");d.className="fb";d.textContent=name;art.prepend(d)};i.src=src;i.decode?i.decode().then(add,()=>{}):add()}
 function setLogo(img,u){if(img.getAttribute("src")!==u){u?img.src=u:img.removeAttribute("src")}img.classList.toggle("has",!!u)}
 const shade=(h,k)=>{const n=parseInt(h.slice(1),16);return"#"+[16,8,0].map(x=>Math.round(((n>>x)&255)*k).toString(16).padStart(2,"0")).join("")};
 function fitTxt(){const e=$("#st");if(!e)return;let f=21;e.style.fontSize=f+"px";while(e.scrollWidth>e.clientWidth+1&&f>11){f--;e.style.fontSize=f+"px"}}
@@ -171,5 +171,7 @@ if(ctl){document.body.classList.add("ctl");ctrl();setInterval(ctTick,300);
   if(d.t){const T=S.timer;if(d.t==="start"){if(!T.left)T.left=dur(curStep());T.end=Date.now()+T.left*1000;T.run=true}else if(d.t==="stop"){if(T.run)T.left=Math.max(0,Math.ceil((T.end-Date.now())/1000));T.run=false}else{T.left=dur(curStep());T.run=false}save()}
   if(t.id==="sw"){[S.A,S.B]=[S.B,S.A];save();ctrl()}if(t.id==="rs"&&confirm("Reset semua data?")){S=def();save();ctrl()}})}
 else{["A","B"].forEach(build);ac();render();document.fonts&&document.fonts.ready.then(fitTxt);setInterval(tick,200);
- ch&&(ch.onmessage=e=>{S=e.data;render()});addEventListener("storage",e=>{if(e.key===KEY){S=JSON.parse(e.newValue);render()}})}
+ ch&&(ch.onmessage=e=>{S=e.data;render()});ch||addEventListener("storage",e=>{if(e.key===KEY){S=JSON.parse(e.newValue);render()}})}
+function warm(){const u=new Set();Object.values(HM).forEach(h=>{u.add("HeroPick/"+h.p+".png");u.add("HeroBan/"+h.b+".png")});const a=[...u];let i=0;(function n(){if(i>=a.length)return;const m=new Image();m.onload=m.onerror=()=>setTimeout(n,30);m.src=a[i++]})()}
+addEventListener("load",()=>setTimeout(warm,1500));
 </script></body></html>

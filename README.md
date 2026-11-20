@@ -38,3 +38,6 @@ Di tab Panggung: pilih mode **Timer mundur** atau **Stopwatch (maju)**, 9 model 
 
 ## Ukuran kotak
 Tab Panggung → **Ukuran & Posisi Kotak**: margin kiri/kanan/atas, jarak ke bar draft, jarak antar kotak, lebar kolom kiri, dan tinggi relatif tiap kotak. Bar draft pick selalu menempel di bawah layar berapa pun ukuran jendelanya.
+
+## Performa
+Preview di panel memakai mode ringan (`live.html?lite`: animasi berulang dimatikan). Output OBS (`live.html`) tetap penuh. Gambar hero dimuat lebih awal di latar belakang dan didekode sebelum ditampilkan supaya pick tidak freeze.

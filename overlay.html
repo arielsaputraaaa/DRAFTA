@@ -38,13 +38,14 @@
 #tmr.s-ring{width:200px;height:200px;min-width:0;padding:0;border-radius:50%}#tmr.s-ring svg{display:block;position:absolute;inset:6px;width:188px;height:188px;transform:rotate(-90deg)}#tmr.s-ring .tk{fill:none;stroke:#fff2;stroke-width:6}#tmr.s-ring .pg{fill:none;stroke:var(--tc);stroke-width:6;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:calc(289 - 289*var(--p,0))}
 #tmr.s-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:50px}#tmr.s-ring small{position:absolute;top:44px;left:0;right:0}
 .p-tl{left:40px}.p-tc{left:50%;transform:translateX(-50%)}.p-tr{right:40px}
-iframe{position:absolute;inset:0;width:1920px;height:100%;border:0;background:transparent;pointer-events:none}
+html.lite #bg,html.lite #bg:before,html.lite #bg:after{animation:none!important}iframe{position:absolute;inset:0;width:1920px;height:100%;border:0;background:transparent;pointer-events:none}
 </style></head><body>
 <div id="stage"><div id="bg"></div><div id="area"><div id="g"><div class="col" id="cl"></div><div class="col" id="cr"></div></div><div id="cm"><div class="h"><i></i><span>Audience Comment</span><span style="opacity:.5">|</span><span id="cu"></span></div><div class="b"><span id="ct"></span></div></div></div>
-<div id="tmr"><small></small><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="46"/><circle class="pg" cx="50" cy="50" r="46"/></svg><b>0:00</b><div class="pb"><u></u></div></div><iframe src="index.html"></iframe></div>
+<div id="tmr"><small></small><svg viewBox="0 0 100 100"><circle class="tk" cx="50" cy="50" r="46"/><circle class="pg" cx="50" cy="50" r="46"/></svg><b>0:00</b><div class="pb"><u></u></div></div><iframe></iframe></div>
 <script src="common.js"></script><script>
-let S=loadS();const $=(s,e=document)=>e.querySelector(s),str={},sig={},EL=[],AN={fade:'fd',up:'up',left:'lf',zoom:'zm',type:'ty',glow:'gl'};
+let S=loadS();const $=(s,e=document)=>e.querySelector(s),LT=/lite/.test(location.search),str={},sig={},EL=[],AN={fade:'fd',up:'up',left:'lf',zoom:'zm',type:'ty',glow:'gl'};
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+LT&&document.documentElement.classList.add('lite');$('iframe').src='index.html'+location.search;
 function fit(){const k=innerWidth/1920;$('#stage').style.height=innerHeight/k+'px';$('#stage').style.transform=`scale(${k})`}addEventListener('resize',fit);fit();
 async function cap(i){try{const s=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});str[i]=s;s.getVideoTracks()[0].onended=()=>{delete str[i];render()};render()}catch(e){}}
 function click(i){const b=S.boxes[i];if(b.type=='cap'){str[i]||cap(i);return}if(b.type!='none'&&b.key)return;const f=document.createElement('input');f.type='file';f.accept='image/*,video/*';f.onchange=async()=>{const x=f.files[0];if(!x)return;const k='f'+Date.now();await put(k,x);b.key=k;b.type=x.type.startsWith('video')?'video':'img';saveS(S);render()};f.click()}

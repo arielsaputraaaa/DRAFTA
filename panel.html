@@ -14,7 +14,7 @@ input,select{width:100%;padding:7px;margin-top:3px;background:#0b1020;color:#fff
 .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.hint{font-size:12px;color:#9fb0cf;margin-top:6px}
 .scb{display:flex;gap:8px}.scb button{flex:1;padding:14px 6px;font:700 18px Oswald;letter-spacing:2px;text-transform:uppercase}.scb button.on{box-shadow:0 0 0 3px #0008,0 0 18px var(--ac)}iframe#lbf{height:calc(100vh - 190px)}</style></head><body>
 <header><h1>Panel Kontrol — Draft + Panggung</h1><button data-v="st" class="on">Panggung (Atas)</button><button data-v="dr">Draft Pick (Bawah)</button><button data-v="lb">Lobby Esports</button><a class="btn pri" href="live.html" target="_blank">Buka Output Live ↗</a></header>
-<main><div id="L"></div><div id="R"><fieldset id="scf"><legend>Pindah Scene</legend><div id="scn"></div></fieldset><div id="pv"><iframe id="ov" src="live.html" allow="display-capture"></iframe></div><p class="hint">Preview langsung (1920×1080). Untuk OBS pakai Browser Source ke <b>live.html</b>.</p></div></main>
+<main><div id="L"></div><div id="R"><fieldset id="scf"><legend>Pindah Scene</legend><div id="scn"></div></fieldset><div id="pv"><iframe id="ov" src="live.html?lite" allow="display-capture"></iframe></div><p class="hint">Preview ringan (animasi berulang dimatikan supaya panel tidak lag). Untuk OBS pakai Browser Source ke <b>live.html</b>.</p></div></main>
 <script src="common.js"></script><script>
 let S=loadS(),V='st';const $=(s,e=document)=>e.querySelector(s),sv=()=>saveS(S);
 const g=p=>p.split('.').reduce((o,k)=>o[k],S),sp=(p,v)=>{const a=p.split('.');let o=S;a.slice(0,-1).forEach(k=>o=o[k]);o[a.pop()]=v};
