@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Overlay Gabungan</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Lato:wght@700&family=Inter:wght@800&display=swap" rel="stylesheet">
+<style>
+:root{--ac:#f5c06f;--bd:#d4ab4c;--pn:#111827;--c1:#0b2a66;--c2:#10204a;--tc:#f5c06f}
+*{box-sizing:border-box;margin:0}html,body{height:100%;overflow:hidden;background:transparent;font-family:Lato,Arial,sans-serif;color:#fff}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#bg{position:absolute;inset:0;overflow:hidden}#bg>video,#bg>img{width:100%;height:100%;object-fit:cover}
+.a-aurora{background:var(--c1)}.a-aurora:before,.a-aurora:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle at 30% 40%,var(--c2),transparent 45%),radial-gradient(circle at 70% 60%,var(--ac),transparent 40%);opacity:.5;animation:mv 14s ease-in-out infinite alternate}.a-aurora:after{animation-duration:21s;animation-direction:alternate-reverse;opacity:.3}
+@keyframes mv{to{transform:translate(8%,6%) rotate(25deg) scale(1.2)}}
+.a-gradient{background:linear-gradient(120deg,var(--c1),var(--c2),var(--c1));background-size:300% 300%;animation:gs 12s ease infinite}@keyframes gs{50%{background-position:100% 50%}}
+.a-pulse{background:radial-gradient(circle,var(--c2),var(--c1) 70%);animation:pu 4s ease-in-out infinite alternate}@keyframes pu{to{filter:brightness(1.6) saturate(1.3)}}
+.a-grid{background:linear-gradient(var(--c1),var(--c2))}.a-grid:before{content:"";position:absolute;inset:0;background:linear-gradient(#fff2 1px,transparent 1px),linear-gradient(90deg,#fff2 1px,transparent 1px);background-size:60px 60px;animation:gm 4s linear infinite}@keyframes gm{to{background-position:60px 60px}}
+#area{position:absolute;left:40px;top:30px;width:1840px;height:690px;display:flex;flex-direction:column}
+#g{flex:1;display:flex;gap:24px;min-height:0}.col{display:flex;flex-direction:column;gap:24px;min-width:0}.bx{flex:1;min-height:0;cursor:pointer}
+.bx{position:relative;overflow:hidden;background:var(--pn);border:2px solid var(--bd);box-shadow:0 0 0 4px #0008,0 10px 40px #000a}
+.m{position:absolute;inset:0;width:100%;height:100%}.ph{display:flex;align-items:center;justify-content:center;color:var(--ac);font:700 26px Lato;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px}
+.cp{position:absolute;left:0;right:0;bottom:0;padding:70px 24px 18px;text-align:center;background:linear-gradient(transparent,#000e);overflow:hidden}
+.t1{font:700 54px/1.1 Oswald;text-transform:uppercase;letter-spacing:1px;text-shadow:0 2px 8px #000}
+.t2{font:700 28px Oswald;letter-spacing:3px;color:#f2c94c;text-transform:uppercase;margin-top:4px}
+.cp .t{animation:var(--an,none) 1s both}.cp .t2{animation-delay:.3s}
+.cp.type .t{animation-duration:2s;animation-timing-function:steps(26)}.cp.glow .t{animation-iteration-count:infinite;animation-direction:alternate}
+@keyframes fd{from{opacity:0}}@keyframes up{from{opacity:0;transform:translateY(40px)}}@keyframes lf{from{opacity:0;transform:translateX(-90px)}}@keyframes zm{from{opacity:0;transform:scale(.6)}}@keyframes ty{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}@keyframes gl{from{text-shadow:0 0 0 #0000}to{text-shadow:0 0 26px var(--ac),0 2px 8px #000}}
+.mq{overflow:hidden;white-space:nowrap}.mq span,#cm .b span{display:inline-block;padding-left:100%;animation:mq 12s linear infinite}@keyframes mq{to{transform:translateX(-100%)}}
+#cm{height:92px;margin-top:20px;display:none;flex-direction:column;border:1px solid #fff3}
+#cm .h{height:34px;background:var(--pn);display:flex;align-items:center;gap:10px;padding:0 14px;font:700 17px Oswald;letter-spacing:1px;text-transform:uppercase;color:#cfd8ea}#cm .h i{width:12px;height:12px;background:var(--ac)}
+#cm .b{flex:1;background:var(--ac);color:#111;font:800 30px/1 Inter;overflow:hidden;display:flex;align-items:center;white-space:nowrap}
+#tmr{position:absolute;top:6px;min-width:190px;padding:4px 22px 6px;text-align:center;background:var(--pn);border:2px solid var(--bd);box-shadow:0 6px 20px #000a;display:none;z-index:5}
+#tmr small{display:block;font:700 15px Oswald;letter-spacing:4px;color:var(--ac)}#tmr b{font:700 58px/1 Oswald;color:var(--tc)}#tmr.low b{color:#ff4a4a;animation:bl .5s infinite alternate}@keyframes bl{to{opacity:.3}}
+.p-tl{left:40px}.p-tc{left:50%;transform:translateX(-50%)}.p-tr{right:40px}
+iframe{position:absolute;inset:0;width:1920px;height:1080px;border:0;background:transparent;pointer-events:none}
+</style></head><body>
+<div id="stage"><div id="bg"></div><div id="area"><div id="g"><div class="col" id="cl"></div><div class="col" id="cr"></div></div><div id="cm"><div class="h"><i></i><span>Audience Comment</span><span style="opacity:.5">|</span><span id="cu"></span></div><div class="b"><span id="ct"></span></div></div></div>
+<div id="tmr"><small></small><b>0:00</b></div><iframe src="index.html"></iframe></div>
+<script src="common.js"></script><script>
+let S=loadS();const $=(s,e=document)=>e.querySelector(s),str={},sig={},EL=[],AN={fade:'fd',up:'up',left:'lf',zoom:'zm',type:'ty',glow:'gl'};
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function fit(){$('#stage').style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`}addEventListener('resize',fit);fit();
+async function cap(i){try{const s=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});str[i]=s;s.getVideoTracks()[0].onended=()=>{delete str[i];render()};render()}catch(e){}}
+function click(i){const b=S.boxes[i];if(b.type=='cap'){str[i]||cap(i);return}if(b.type!='none'&&b.key)return;const f=document.createElement('input');f.type='file';f.accept='image/*,video/*';f.onchange=async()=>{const x=f.files[0];if(!x)return;const k='f'+Date.now();await put(k,x);b.key=k;b.type=x.type.startsWith('video')?'video':'img';saveS(S);render()};f.click()}
+async function media(i,b,el,s){let m;
+ if(b.type=='cap'&&str[i]){m=document.createElement('video');m.srcObject=str[i];m.muted=m.autoplay=true}
+ else if(b.type=='img'||b.type=='video'){const f=await get(b.key);if(f){m=document.createElement(b.type=='img'?'img':'video');m.src=URL.createObjectURL(f);if(b.type=='video'){m.autoplay=m.loop=true;m.muted=!b.snd}}}
+ if(sig[i]!==s)return;$('.m',el)&&$('.m',el).remove();
+ if(!m){m=document.createElement('div');m.className='ph';m.textContent=b.type=='cap'?'Klik untuk capture layar':'Klik untuk upload foto atau video (MP4)'}
+ m.classList.add('m');m.style.objectFit=b.fit;el.prepend(m);m.play&&m.play().catch(()=>{})}
+async function bgR(){const bg=$('#bg'),B=S.bg,s=JSON.stringify(B);if(bg.dataset.s===s)return;bg.dataset.s=s;bg.className='';bg.innerHTML='';bg.style.background='';
+ if(B.t=='anim')bg.className='a-'+B.an;else if(B.t=='color')bg.style.background=B.c1;
+ else if(B.t=='media'&&B.key){const f=await get(B.key);if(f&&bg.dataset.s===s){const m=document.createElement(B.mt=='video'?'video':'img');m.src=URL.createObjectURL(f);if(B.mt=='video')m.autoplay=m.loop=m.muted=true;bg.append(m)}}}
+function render(){const r=document.documentElement.style,t=S.th;r.setProperty('--ac',t.ac);r.setProperty('--bd',t.bd);r.setProperty('--pn',t.pn);r.setProperty('--c1',S.bg.c1);r.setProperty('--c2',S.bg.c2);r.setProperty('--tc',S.tm.col);bgR();
+ $('#cl').style.flex=S.wl;$('#cr').style.flex=100-S.wl;
+ for(let i=0;i<6;i++){const col=$(i<3?'#cl':'#cr'),vis=i<3?i<S.nl:i-3<S.nr;let el=EL[i];
+  if(!el){el=EL[i]=document.createElement('div');el.className='bx';el.innerHTML='<div class="cp"></div>';el.onclick=()=>click(i);col.append(el)}
+  el.style.display=vis?'':'none';if(!vis){delete sig[i];continue}
+  const b=S.boxes[i],s=[b.type,b.key,b.fit,b.snd,!!str[i]].join('|');if(sig[i]!==s){sig[i]=s;media(i,b,el,s)}
+  const cp=$('.cp',el),cs=[b.title,b.sub,b.anim,S.ts,S.rp].join('|');
+  if(cp.dataset.s!==cs){cp.dataset.s=cs;cp.className='cp '+b.anim;cp.style.setProperty('--an',AN[b.anim]||'none');cp.style.display=b.title||b.sub?'':'none';
+   const w=x=>b.anim=='marquee'?`<span style="animation-duration:${S.ts}s">${esc(x)}</span>`:esc(x);
+   cp.innerHTML=(b.title?`<div class="t t1${b.anim=='marquee'?' mq':''}">${w(b.title)}</div>`:'')+(b.sub?`<div class="t t2${b.anim=='marquee'?' mq':''}">${w(b.sub)}</div>`:'')}}
+ const c=S.cm,cm=$('#cm');cm.style.display=c.on?'flex':'none';$('#cu').textContent=c.user;$('#ct').textContent=c.text;$('#ct').style.animationDuration=c.sp+'s';$('#g').style.marginBottom=0;tick()}
+function tick(){const T=S.tm,e=$('#tmr'),l=T.run?Math.max(0,Math.ceil((T.end-Date.now())/1000)):T.left;e.style.display=T.on?'block':'none';e.className='p-'+T.pos+(T.run&&l<=10?' low':'');$('small',e).textContent=T.label;$('b',e).textContent=Math.floor(l/60)+':'+String(l%60).padStart(2,'0')}
+render();setInterval(tick,200);ch&&(ch.onmessage=e=>{S=e.data;render()});addEventListener('storage',e=>{if(e.key==KEY){S=loadS();render()}});
+</script></body></html>

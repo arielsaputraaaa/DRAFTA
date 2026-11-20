@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Panel Kontrol Gabungan</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ac:#f5c06f;--bd:#d4ab4c;--bg:#0b1020;--pn:#121a2b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0d2250,#0b1020 50%,#08302a);min-height:100vh;color:#e8edf7;font:14px Lato,Arial}
+header{display:flex;gap:8px;align-items:center;padding:10px 16px;background:#0008;border-bottom:1px solid var(--bd)}header h1{font:700 20px Oswald;letter-spacing:2px;color:var(--ac);margin:0 auto 0 0;text-transform:uppercase}
+button,.btn{padding:8px 14px;background:#1c2740;color:#fff;border:1px solid #fff3;cursor:pointer;font:700 13px Lato;text-decoration:none}button.on,button.pri{background:var(--ac);color:#111;border-color:var(--ac)}button.r{background:#a22}
+main{display:flex;gap:16px;padding:16px;align-items:flex-start}#L{flex:1;min-width:0}#R{width:580px;position:sticky;top:12px}
+#pv{width:576px;height:324px;border:2px solid var(--bd);position:relative;overflow:hidden;background:repeating-conic-gradient(#222 0 25%,#333 0 50%) 0 0/20px 20px}#pv iframe{width:1920px;height:1080px;border:0;transform:scale(.3);transform-origin:0 0}
+fieldset{border:1px solid var(--bd);background:var(--pn);margin:0 0 14px;padding:12px}legend{padding:0 8px;font:700 16px Oswald;letter-spacing:1px;color:var(--ac);text-transform:uppercase}
+.gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}label{display:block;font-size:12px;color:#9fb0cf}label.ck{display:flex;gap:6px;align-items:center;color:#e8edf7;padding-top:18px}
+input,select{width:100%;padding:7px;margin-top:3px;background:#0b1020;color:#fff;border:1px solid #fff3}input[type=checkbox]{width:auto;margin:0}input[type=color]{height:34px;padding:2px}
+.ds{grid-column:1/-1;font-size:12px;color:#f2c94c;background:#0006;padding:6px 8px;border-left:3px solid var(--ac)}iframe#dr{width:100%;height:calc(100vh - 70px);border:0;background:#161820}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.hint{font-size:12px;color:#9fb0cf;margin-top:6px}
+</style></head><body>
+<header><h1>Panel Kontrol — Draft + Panggung</h1><button data-v="st" class="on">Panggung (Atas)</button><button data-v="dr">Draft Pick (Bawah)</button><a class="btn pri" href="overlay.html" target="_blank">Buka Overlay ↗</a></header>
+<main><div id="L"></div><div id="R"><div id="pv"><iframe id="ov" src="overlay.html" allow="display-capture"></iframe></div><p class="hint">Preview langsung (hasil akhir 1920×1080). Untuk OBS pakai Browser Source ke <b>overlay.html</b>.</p></div></main>
+<script src="common.js"></script><script>
+let S=loadS(),V='st';const $=(s,e=document)=>e.querySelector(s),sv=()=>saveS(S);
+const g=p=>p.split('.').reduce((o,k)=>o[k],S),sp=(p,v)=>{const a=p.split('.');let o=S;a.slice(0,-1).forEach(k=>o=o[k]);o[a.pop()]=v};
+const q=v=>String(v).replace(/"/g,'&quot;');
+const inp=(p,l,t='text',x='')=>`<label>${l}<input type="${t}" data-k="${p}" value="${q(g(p))}" ${x}></label>`;
+const sel=(p,l,o)=>`<label>${l}<select data-k="${p}">${Object.entries(o).map(([v,n])=>`<option value="${v}" ${g(p)==v?'selected':''}>${n}</option>`).join('')}</select></label>`;
+const chk=(p,l)=>`<label class="ck"><input type="checkbox" data-k="${p}" ${g(p)?'checked':''}>${l}</label>`;
+const ANIM={none:['Tanpa animasi','Teks langsung tampil diam.'],fade:['Fade in','Teks muncul perlahan dari transparan ke jelas (1 detik).'],up:['Naik dari bawah','Teks meluncur naik sambil muncul; subjudul menyusul 0,3 detik kemudian.'],left:['Geser dari kiri','Teks masuk dari sisi kiri ke posisi tengah.'],zoom:['Zoom in','Teks membesar dari kecil ke ukuran penuh.'],type:['Diketik','Teks terbuka huruf demi huruf dari kiri ke kanan seperti mesin ketik.'],glow:['Glow berdenyut','Teks diam tapi bersinar berkedip terus-menerus (warna aksen).'],marquee:['Running text','Teks berjalan terus dari kanan ke kiri tanpa henti. Kecepatan diatur di “Durasi 1 putaran”.']};
+const AO=Object.fromEntries(Object.entries(ANIM).map(([k,v])=>[k,v[0]]));
+const boxUI=i=>{const b=S.boxes[i],p='boxes.'+i;return`<fieldset><legend>${i<3?'Kiri '+(i+1):'Kanan '+(i-2)}</legend><div class="gr">
+${sel(p+'.type','Isi kotak',{none:'Kosong',img:'Foto',video:'Video (MP4)',cap:'Capture layar / window'})}
+${b.type=='img'||b.type=='video'?`<label>Upload ${b.type=='img'?'foto':'video'}<input type="file" accept="image/*,video/*" data-up="${i}"></label>${b.key?'<label class="ck" style="color:#7fe08a">✔ file tersimpan</label>':''}`:''}
+${b.type=='cap'?`<label>&nbsp;<button class="pri" data-cap="${i}">Mulai capture</button></label>`:''}
+${sel(p+'.fit','Ukuran media',{cover:'Penuhi kotak (crop)',contain:'Muat utuh'})}${b.type=='video'?chk(p+'.snd','Suara video'):''}
+${inp(p+'.title','Judul')}${inp(p+'.sub','Subjudul')}${sel(p+'.anim','Gerak teks',AO)}
+<div class="ds">▶ ${ANIM[b.anim][0]}: ${ANIM[b.anim][1]}</div></div></fieldset>`};
+function stUI(){const ids=[...Array(+S.nl).keys(),...[...Array(+S.nr).keys()].map(j=>j+3)];return`<fieldset><legend>Kotak Konten (default 1 kiri + 1 kanan)</legend><div class="gr">${sel('nl','Jumlah kotak kiri (ditumpuk)',{1:'1',2:'2',3:'3'})}${sel('nr','Jumlah kotak kanan (ditumpuk)',{1:'1',2:'2',3:'3'})}${inp('wl','Lebar kolom kiri (%)','number','min=30 max=70')}${inp('ts','Durasi 1 putaran running text (detik)','number','min=3')}</div><div class="row"><button data-rp="1">↻ Ulangi animasi teks</button></div></fieldset>
+${ids.map(boxUI).join('')}
+<fieldset><legend>Komentar Penonton</legend><div class="gr">${chk('cm.on','Tampilkan bar komentar')}${inp('cm.user','Nama / @username')}${inp('cm.text','Isi komentar')}${inp('cm.sp','Durasi 1 putaran (detik)','number','min=3')}</div></fieldset>
+<fieldset><legend>Timer Panggung</legend><div class="gr">${chk('tm.on','Tampilkan timer')}${sel('tm.pos','Posisi',{tl:'Kiri atas',tc:'Tengah atas',tr:'Kanan atas'})}${inp('tm.label','Label')}${inp('tm.dur','Durasi (detik)','number','min=1')}${inp('tm.col','Warna angka','color')}</div>
+<div class="row"><button class="pri" data-t="start">▶ Start</button><button data-t="stop">⏸ Stop</button><button data-t="reset">⟲ Reset</button><button data-d="30">0:30</button><button data-d="60">1:00</button><button data-d="300">5:00</button><button data-d="600">10:00</button></div></fieldset>
+<fieldset><legend>Background</legend><div class="gr">${sel('bg.t','Jenis',{none:'Transparan (untuk OBS)',color:'Warna solid',anim:'Animasi',media:'Upload gambar / video'})}${S.bg.t=='anim'?sel('bg.an','Animasi',{aurora:'Aurora bergerak',gradient:'Gradasi bergeser',pulse:'Berdenyut',grid:'Grid berjalan'}):''}${S.bg.t=='media'?`<label>Upload background<input type="file" accept="image/*,video/*" data-bgup="1"></label>`:''}${inp('bg.c1','Warna 1','color')}${S.bg.t=='anim'?inp('bg.c2','Warna 2','color'):''}</div></fieldset>
+<fieldset><legend>Warna Bingkai</legend><div class="gr">${inp('th.ac','Aksen / bar komentar','color')}${inp('th.bd','Garis bingkai','color')}${inp('th.pn','Panel gelap','color')}</div><div class="row"><button data-th='{"ac":"#f5c06f","bd":"#d4ab4c","pn":"#111827"}'>Preset Emas–Navy (referensi)</button><button data-th='{"ac":"#ff3b3b","bd":"#e32b2b","pn":"#1a0d10"}'>Preset Merah</button></div></fieldset>`}
+function draw(){document.querySelectorAll('header [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v==V));
+ $('#L').innerHTML=V=='st'?stUI():'<iframe id="dr" src="index.html?control"></iframe>';$('#R').style.display=V=='st'?'':'none';if(V=='dr'){$('#R').style.display='';}}
+addEventListener('change',async e=>{const t=e.target,d=t.dataset;
+ if(d.up!==undefined&&t.files[0]){const f=t.files[0],k='f'+Date.now(),b=S.boxes[d.up];await put(k,f);b.key=k;b.type=f.type.startsWith('video')?'video':'img';sv();return draw()}
+ if(d.bgup&&t.files[0]){const f=t.files[0],k='bg'+Date.now();await put(k,f);S.bg.key=k;S.bg.mt=f.type.startsWith('video')?'video':'img';sv();return draw()}
+ if(!d.k)return;let v=t.type=='checkbox'?t.checked:t.type=='number'?Math.max(1,+t.value||1):t.value;if(/^n[lr]$/.test(d.k))v=+t.value;sp(d.k,v);
+ if(d.k=='tm.dur'&&!S.tm.run)S.tm.left=v;sv();if(/\.type$|^n[lr]$|\.anim$|^bg\.t$/.test(d.k))draw()});
+addEventListener('input',e=>{const d=e.target.dataset;if(d.k&&/text|color/.test(e.target.type)){sp(d.k,e.target.value);sv()}});
+addEventListener('click',e=>{const t=e.target,d=t.dataset,T=S.tm;
+ if(d.v){V=d.v;draw()}if(d.cap!==undefined)$('#ov').contentWindow.cap(+d.cap);if(d.rp){S.rp=Date.now();sv()}
+ if(d.th){Object.assign(S.th,JSON.parse(d.th));sv();draw()}
+ if(d.d){T.dur=+d.d;if(!T.run)T.left=T.dur;sv();draw()}
+ if(d.t){if(d.t=='start'){if(!T.left)T.left=T.dur;T.end=Date.now()+T.left*1000;T.run=true}else if(d.t=='stop'){if(T.run)T.left=Math.max(0,Math.ceil((T.end-Date.now())/1000));T.run=false}else{T.left=T.dur;T.run=false}sv()}});
+draw();ch&&(ch.onmessage=e=>{S=e.data;V=='st'&&draw()});
+</script></body></html>

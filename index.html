@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Draft Pick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=Orbitron:wght@800&family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--g1:#fff;--g2:#9fb3c8;--g3:#3b4a5e}
+*{box-sizing:border-box;margin:0}html,body{height:100%;overflow:hidden;background:transparent;font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;color:#fff}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#bar{position:absolute;left:0;top:750px;width:1920px;height:330px;display:flex;background:#070b14;box-shadow:0 -10px 40px #000a;animation:up .9s cubic-bezier(.2,.9,.2,1) both}
+@keyframes up{from{transform:translateY(100%)}}
+.side{width:750px;display:flex;flex-direction:column;--c:#1f5fd6;--cd:#0b2a66;--cm:#154a9f}
+.top{height:80px;display:flex;background:#12161f}#B .top{flex-direction:row-reverse}
+.tm{width:290px;display:flex;align-items:center;gap:10px;padding:0 16px;background:linear-gradient(90deg,var(--cd),#0b0f18)}
+#B .tm{flex-direction:row-reverse;text-align:right;background:linear-gradient(270deg,var(--cd),#0b0f18)}
+.hs{width:30px;height:30px;fill:#fff;flex:none}
+.ava{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #fff;display:none;flex:none}.ava.has{display:block}
+.nb{min-width:0}.tn{display:block;font:800 italic 44px/1 "Barlow Condensed";white-space:nowrap;overflow:hidden;letter-spacing:.5px;text-shadow:0 2px 6px #000}
+.sb{display:block;font:600 14px "Barlow Condensed";letter-spacing:2px;text-transform:uppercase;opacity:.85;margin-top:2px}
+.bans{flex:1;display:flex}.b{flex:1;position:relative;overflow:hidden;border-left:1px solid #ffffff22;background:#0c1018}
+.b .hp{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;filter:grayscale(1) brightness(.85);opacity:0}.b.on .hp{opacity:1}
+.b .x{position:absolute;left:50%;top:50%;width:42px;transform:translate(-50%,-50%);opacity:.2}.b.on .x{opacity:0}
+.b.act:before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px #ff4a4a;z-index:2;animation:pl 1s infinite alternate}
+.b.fresh .hp{animation:bn 1.4s ease-out}.b.fresh:after{content:"";position:absolute;inset:0;background:#f22;animation:fl 1.4s forwards}
+@keyframes bn{from{transform:scale(1.6);filter:none}}@keyframes fl{from{opacity:.8}to{opacity:0}}
+.pks{flex:1;display:flex;min-height:0}.s{width:150px;position:relative;overflow:hidden;border-right:1px solid #ffffff2a;background:#05070f}.s:last-child{border:0}
+.art{position:absolute;inset:0;overflow:hidden;background:linear-gradient(160deg,var(--c),var(--cd))}
+.art>.hero,.art>.fb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;transform-origin:50% 30%}
+.fb{display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;color:#fff;font:700 20px "Barlow Condensed";text-transform:uppercase;background:linear-gradient(160deg,#556,#223)}
+.art .lg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:74px;opacity:.9;display:none}.s.idle .lg.has{display:block}
+.hn{position:absolute;left:0;top:0;bottom:0;width:42px;z-index:2;display:flex;justify-content:center;padding-top:12px;background:linear-gradient(90deg,#000c,#0000);pointer-events:none}
+.hn span{writing-mode:vertical-rl;font:800 26px "Barlow Condensed";letter-spacing:2px;text-transform:uppercase;white-space:nowrap;text-shadow:0 2px 4px #000;max-height:205px;overflow:hidden}
+.pn{display:flex;height:30px;background:var(--cm)}.pn div{flex:1;text-align:center;font:700 19px/30px "Barlow Condensed";text-transform:uppercase;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px;border-right:1px solid #ffffff25}.pn div:last-child{border:0}
+.s.on .art>.hero,.s.on .art>.fb{animation:rev var(--pd,1.8s) cubic-bezier(.25,.8,.25,1),kb var(--kd,8s) ease-in-out var(--pd,1.8s) infinite alternate,lit 3s ease-in-out var(--pd,1.8s) infinite alternate}
+@keyframes rev{0%{clip-path:inset(100% 0 0 0);transform:scale(1.35);filter:brightness(2.2)}55%{filter:brightness(1.5)}100%{clip-path:inset(0);transform:none;filter:none}}
+@keyframes kb{from{transform:scale(1) translate(0,0)}50%{transform:scale(1.12) translate(3%,-2%)}to{transform:scale(1.18) translate(-3%,-3.5%)}}
+@keyframes lit{from{filter:brightness(1) saturate(1)}to{filter:brightness(1.16) saturate(1.15)}}
+.s:nth-child(1){--i:0;--kd:8s}.s:nth-child(2){--i:1;--kd:10s}.s:nth-child(3){--i:2;--kd:9s}.s:nth-child(4){--i:3;--kd:11s}.s:nth-child(5){--i:4;--kd:7s}
+.s.act .art:after{content:"PICKING";position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;color:#fff;font:800 20px "Barlow Condensed";letter-spacing:3px;box-shadow:inset 0 0 0 4px #fff;animation:pl 1s infinite alternate}
+@keyframes pl{from{opacity:.3}to{opacity:1}}
+.s:not(.idle) .art:before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.38) 50%,transparent 62%);transform:translateX(-120%);animation:shn 6s calc(var(--pd,1.8s) + var(--i)*.9s) infinite}
+@keyframes shn{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.s:not(.idle):after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;z-index:3;background:linear-gradient(90deg,transparent,#fff,transparent);animation:pl 2.4s calc(var(--i)*.5s) infinite alternate}
+.noidle .s.on .art>.hero,.noidle .s.on .art>.fb{animation-name:rev}.noidle .s .art:before,.noidle .s:after{display:none}
+#C{width:420px;position:relative;background:linear-gradient(#0f1628,#070b14);border:0 solid #ffffff30;border-width:0 1px}
+#lg{position:absolute;left:50%;top:-62px;transform:translateX(-50%);height:158px;filter:drop-shadow(0 6px 14px #000c);animation:fy 4s infinite alternate ease-in-out}@keyframes fy{to{transform:translate(-50%,-6px)}}
+#tn{position:absolute;top:100px;left:16px;right:16px;text-align:center;font:800 30px/1.15 Orbitron,"Arial Black",sans-serif;letter-spacing:2px;text-transform:uppercase;color:#fff;animation:gl 3s infinite alternate}
+@keyframes gl{from{text-shadow:0 2px 6px #000}to{text-shadow:0 0 14px #ffffff88,0 2px 6px #000}}
+#st{position:absolute;top:176px;left:0;right:0;text-align:center;font:600 21px "Barlow Condensed";letter-spacing:3px;color:#fff;text-transform:uppercase;white-space:nowrap;overflow:hidden;padding:0 62px}
+#st:before,#st:after{content:"";position:absolute;top:50%;width:50px;height:2px;background:linear-gradient(90deg,transparent,#fff9)}#st:before{left:22px}#st:after{right:22px;transform:scaleX(-1)}
+.bt{position:absolute;left:0;right:0;bottom:0;height:112px;display:grid;grid-template-columns:130px 1fr 130px;border-top:1px solid #ffffff30;background:linear-gradient(#0a0f1c,#04060c)}
+.tl{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:4px;border-bottom:5px solid var(--c);--c:#1f5fd6}.tl img{max-width:70px;max-height:56px}
+.pp{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.pp i{width:12px;height:12px;transform:rotate(45deg);border:2px solid #fff}.pp i.on{background:#fff;box-shadow:0 0 8px #fff;animation:pop .6s cubic-bezier(.2,1.8,.4,1)}
+@keyframes pop{from{transform:scale(0) rotate(180deg)}}
+.mc{display:flex;flex-direction:column;align-items:center;justify-content:center}.row{display:flex;align-items:center;gap:14px}
+#tm{font:700 46px/1 Rajdhani;color:#fff}#tm.low{color:#ff4a4a;animation:pl .5s infinite alternate}
+#sc{font:700 28px/1 Rajdhani;color:#fff;margin-top:4px;letter-spacing:3px}
+.ar{width:0;height:0;border:11px solid transparent;opacity:.12}#ta{border-right:18px solid #fff;border-left:0}#tb{border-left:18px solid #fff;border-right:0}.ar.on{opacity:1;animation:bob .7s infinite alternate}
+@keyframes bob{to{transform:translateX(5px)}}#ta.on{animation-name:bobl}@keyframes bobl{to{transform:translateX(-5px)}}
+body.ctl{overflow:auto;background:#161820;color:#eee;font:14px Arial;padding:16px}.ctl #stage{display:none}#cp{display:none;max-width:1150px;margin:auto}.ctl #cp{display:block}
+#cp h1{font-size:20px;margin-bottom:10px}#cp .row2{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0}#cp fieldset{flex:1;min-width:320px;border:1px solid #444;padding:10px;border-radius:8px}#cp legend{padding:0 6px;font-weight:700}
+#cp input{width:100%;padding:5px;margin:2px 0;background:#2a2d36;color:#fff;border:1px solid #555;border-radius:4px}#cp .g{display:grid;grid-template-columns:30px 1fr 1fr 1fr;gap:4px;align-items:center}#cp .g b{font-size:12px;color:#9ab}
+#cp button{padding:6px 12px;margin:4px 4px 0 0;background:#3b6cf6;color:#fff;border:0;border-radius:4px;cursor:pointer}#cp button.r{background:#c33}#cp .sc{font-size:22px;margin:6px 0}#cp .sc b{display:inline-block;min-width:36px;text-align:center}
+#cp .tabs{display:flex;gap:6px;margin-bottom:12px}#cp .tabs button{background:#2a2d36;margin:0;padding:9px 16px}#cp .tabs button.on{background:#d4ab4c;color:#000;font-weight:700}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}.st{padding:6px 8px;border-radius:6px;background:#23262f;border:1px solid #444}.st.A.done{border-color:#2a6cf0}.st.B.done{border-color:#d6303c}.st.cur{outline:2px solid #f9eaa8;background:#3a3420}.st small{display:block;color:#9ab;font-size:11px}.big{font-size:20px;color:#f9eaa8;margin:4px 0}
+</style></head><body>
+<div id="stage"><div id="bar"><div class="side" id="A"></div>
+<div id="C"><img id="lg"><div id="tn"></div><div id="st"></div>
+<div class="bt"><div class="tl" id="lA"></div><div class="mc"><div class="row"><span class="ar" id="ta"></span><div id="tm">0:00</div><span class="ar" id="tb"></span></div><div id="sc"></div></div><div class="tl" id="lB"></div></div></div>
+<div class="side" id="B"></div></div></div>
+<div id="cp"><h1>Draft Pick – Panel Kontrol</h1><div id="cf"></div></div>
+<script>
+const HEROES=["aamon","akai","aldous","alice","alpha","alucard","angela","argus","arlot","atlas","aulus","aurora","badang","balmond","bane","barats","baxia|Baxia","beatrix","beleric|Beleric","benedetta|Benedeta","brody","bruno","carmila","cecilion|Cecilion","chang'e|Change","chip","chou","cici","claude","clint","cyclops","diggie","dyroth","edith","esmeralda","estes","eudora","fanny","faramis","floryn","franco","fredrin","freya","gatotkaca","gloo","gord","granger","grock","guinevere","gusion","hanabi","hanzo","harith","harley","hayabusa","helcurt","hilda","hylos","irithel","ixia","jawhead","johnson","joy","julian","kadita","kagura","kaja","karina","karrie|karie","khaleed","khufra","kimmy","lancelot","lapu lapu","layla","leomord","lesley","ling","lolita","lunox","luo yi|luoyi","lylia","martis","masha","mathilda","melissa","minotour","minsitthar","miya","moskov","nana","natalia","nathan|natan","nolan","novaria","odette","paquito|Pauqito","parsha","phoveus","popol and kupa|popol","rafaela","roger","ruby","saber","selena","silvanna|silvana","sun","suyou","terizla","thamuz","tigreal","uranus","vale","valentina","valir","vexana","wanwan","xavier","xborg","yin","yisunshin","yuzhong","yve","zhask","zhuxin","zilong","lukas","kalea","zetian","obsidia","sora","marcel","hirara"].map(s=>{const[p,b]=s.split("|");return{n:p,p,b:b||p}}),HM={};HEROES.forEach(h=>HM[h.n]=h);
+const ORDER=[["A","b",0],["B","b",0],["A","b",1],["B","b",1],["A","b",2],["B","b",2],["A","p",0],["B","p",0,2],["A","p",1,2],["B","p",2],["A","b",3],["B","b",3],["A","b",4],["B","b",4],["B","p",3],["A","p",3,2],["B","p",4]];
+const fld=y=>y==="b"?"bn":"pk",idl=v=>!v||v==="idle",slots=o=>Array.from({length:o[3]||1},(_,j)=>o[2]+j),curStep=()=>ORDER.find(o=>slots(o).some(i=>idl(S[o[0]][fld(o[1])][i])));
+const stepTxt=()=>{const c=curStep();if(!c)return"Draft selesai ✔";return`Langkah ${ORDER.indexOf(c)+1}/${ORDER.length} → Tim ${c[0]==="A"?"BIRU (kiri)":"MERAH (kanan)"} ${c[1]==="b"?"BAN":"PICK"} ${slots(c).map(i=>i+1).join(" & ")}`};
+const KEY="dp2",ch="BroadcastChannel"in window?new BroadcastChannel("dp2"):null;
+const blank=n=>({n,sub:"",logo:"",ava:"",pl:["Player 1","Player 2","Player 3","Player 4","Player 5"],pk:Array(5).fill(""),bn:Array(5).fill(""),sc:0});
+const def=()=>({tour:"TOURNAMENT BY ARTHES",stage:"Lower Bracket Finals Game 6",mid:"logo.png",max:3,auto:true,live:true,anim:1.8,snd:{on:true,vol:.7},bg:{t:"none",c:"#0a0f1e",img:""},turn:"",timer:{bd:30,pd:30,left:30,end:0,run:false},A:{...blank("RRQ Hoshi"),col:"#1f5fd6"},B:{...blank("Team Liquid ID"),col:"#c8283a"}});
+function mg(d,s){if(s)for(const k in d){if(k in s){if(d[k]&&typeof d[k]==="object"&&!Array.isArray(d[k]))mg(d[k],s[k]);else d[k]=s[k]}}return d}
+let S;try{S=mg(def(),JSON.parse(localStorage.getItem(KEY)))}catch(e){S=def()}
+if(S.tour==="Tournament Name")S.tour=def().tour;if(S.mid==="False.png")S.mid="logo.png";
+const ctl=new URLSearchParams(location.search).has("control");
+const $=(s,e=document)=>e.querySelector(s),$$=(s,e=document)=>e.querySelectorAll(s);
+const pick=id=>HM[id]?"HeroPick/"+HM[id].p+".png":"",ban=id=>HM[id]?"HeroBan/"+HM[id].b+".png":"";
+let AC,lastBeep=-1;
+function ac(){if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}return AC}
+["pointerdown","keydown"].forEach(ev=>addEventListener(ev,()=>{const a=ac();a&&a.state==="suspended"&&a.resume()}));
+function tone(f,at,d,type,v,to){const a=ac();if(!a||!S.snd.on||a.state!=="running")return;const o=a.createOscillator(),g=a.createGain(),n=a.currentTime+at;
+ o.type=type;o.frequency.setValueAtTime(f,n);to&&o.frequency.exponentialRampToValueAtTime(to,n+d);
+ g.gain.setValueAtTime(0.0001,n);g.gain.exponentialRampToValueAtTime(Math.max(.001,S.snd.vol*v),n+.015);g.gain.exponentialRampToValueAtTime(.0001,n+d);
+ o.connect(g);g.connect(a.destination);o.start(n);o.stop(n+d+.05)}
+function noise(at,d,f1,f2,v,type){const a=ac();if(!a||!S.snd.on||a.state!=="running")return;const n=a.currentTime+at,b=a.createBuffer(1,a.sampleRate*d|0,a.sampleRate),x=b.getChannelData(0);for(let i=0;i<x.length;i++)x[i]=Math.random()*2-1;
+ const o=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();o.buffer=b;f.type=type||"bandpass";f.frequency.setValueAtTime(f1,n);f.frequency.exponentialRampToValueAtTime(f2,n+d);f.Q.value=1.2;
+ g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(Math.max(.001,S.snd.vol*v),n+d*.4);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(f);f.connect(g);g.connect(a.destination);o.start(n)}
+const syn={pick(){noise(0,.8,300,3500,.5);tone(110,.7,.8,"sine",1,40);tone(523,.72,1,"triangle",.6);tone(659,.76,1,"triangle",.5);tone(784,.8,1.2,"sine",.5);tone(1046,.84,1.3,"sine",.25)},
+ ban(){noise(0,.6,6000,300,.5,"highpass");tone(90,.02,1,"sine",1,30);tone(311,0,.6,"sawtooth",.22,150);tone(330,0,.6,"sawtooth",.22,160)},
+ warn(){tone(1000,0,.12,"square",.3)},end(){tone(700,0,.8,"sawtooth",.45,250);tone(350,0,.8,"square",.25,125)}};
+const files={};["pick","ban","warn","end"].forEach(n=>{const ex=[".mp3",".wav",".ogg"];(function t(i){if(i>=ex.length)return;const a=new Audio("sound/"+n+ex[i]);a.preload="auto";a.addEventListener("canplaythrough",()=>files[n]=a.src,{once:true});a.addEventListener("error",()=>t(i+1),{once:true});a.load()})(0)});
+function play(n){if(!S.snd.on)return;if(files[n]){const a=new Audio(files[n]);a.volume=S.snd.vol;a.play().catch(()=>{})}else syn[n]()}
+const sfx={pick:()=>play("pick"),ban:()=>play("ban"),warn:()=>play("warn"),end:()=>play("end")};
+function fit(){$("#stage").style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`}addEventListener("resize",fit);fit();
+const prev={A:{pk:[],bn:[]},B:{pk:[],bn:[]}};
+function build(id){const hs='<svg class="hs" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10v6a3 3 0 0 0 3 3h2v-8H5v-1a7 7 0 0 1 14 0v1h-2v8h2a3 3 0 0 0 3-3v-6A10 10 0 0 0 12 2z"/></svg>';
+ $("#"+id).innerHTML=`<div class="top"><div class="tm">${hs}<img class="ava"><div class="nb"><b class="tn"></b><i class="sb"></i></div></div><div class="bans">${'<div class="b"><img class="hp"><img class="x" src="Ban.png"></div>'.repeat(5)}</div></div><div class="pks">${'<div class="s idle"><div class="art"><img class="lg"><div class="hn"><span></span></div></div></div>'.repeat(5)}</div><div class="pn">${"<div></div>".repeat(5)}</div>`}
+function mkimg(art,src,name){const o=$(".hero,.fb",art);o&&o.remove();if(!src)return;const i=new Image();i.className="hero";i.src=src;i.onerror=()=>{i.remove();const d=document.createElement("div");d.className="fb";d.textContent=name;art.prepend(d)};art.prepend(i)}
+function setLogo(img,u){if(img.getAttribute("src")!==u){u?img.src=u:img.removeAttribute("src")}img.classList.toggle("has",!!u)}
+const shade=(h,k)=>{const n=parseInt(h.slice(1),16);return"#"+[16,8,0].map(x=>Math.round(((n>>x)&255)*k).toString(16).padStart(2,"0")).join("")};
+function fitTxt(){const e=$("#st");if(!e)return;let f=21;e.style.fontSize=f+"px";while(e.scrollWidth>e.clientWidth+1&&f>11){f--;e.style.fontSize=f+"px"}}
+function render(){
+ const tn=$("#tn");tn.textContent=S.tour;tn.style.fontSize=(S.tour.length>26?20:S.tour.length>16?28:32)+"px";const st=$("#st");st.textContent=S.stage;fitTxt();
+ const lg=$("#lg");if((lg.getAttribute("src")||"")!==S.mid){S.mid?lg.src=S.mid:lg.removeAttribute("src")}lg.onerror=()=>{lg.dataset.bad=S.mid;lg.style.display="none"};lg.style.display=S.mid&&lg.dataset.bad!==S.mid?"":"none";
+ let sp=0,sb=0;document.documentElement.classList.toggle("noidle",!S.live);document.documentElement.style.setProperty("--pd",S.anim+"s");const cur=curStep(),bg=S.bg;document.documentElement.style.background=bg.t==="color"?bg.c:bg.t==="image"&&bg.img?`#000 url("${bg.img}") center/cover no-repeat`:"transparent";
+ 
+ for(const id of["A","B"]){const t=S[id],pv=prev[id],el=$("#"+id);
+  const tnn=$(".tn",el);tnn.textContent=t.n;tnn.style.fontSize=(t.n.length>16?28:t.n.length>12?34:44)+"px";
+  const col=t.col||"#1f5fd6";[el,$("#l"+id)].forEach(e=>{e.style.setProperty("--c",col);e.style.setProperty("--cd",shade(col,.42));e.style.setProperty("--cm",shade(col,.7))});
+  $$(".pn div",el).forEach((d,i)=>d.textContent=t.pl[i]);$(".sb",el).textContent=t.sub;const av=$(".ava",el);if((av.getAttribute("src")||"")!==t.ava){t.ava?av.src=t.ava:av.removeAttribute("src")}av.classList.toggle("has",!!t.ava);
+  $$(".s",el).forEach((s,i)=>{const v=t.pk[i]||"idle",on=v!=="idle",art=$(".art",s);const hn=$(".hn span",s);hn.textContent=on?v:"";hn.style.fontSize=(v.length>12?18:v.length>9?22:26)+"px";setLogo($(".lg",art),t.logo);
+   if(pv.pk[i]!==v){on&&pv.ok&&(sp=1);mkimg(art,on?pick(v):"",v);s.classList.remove("on");void s.offsetWidth;s.classList.toggle("on",on);s.classList.toggle("idle",!on)}s.classList.toggle("act",!!(cur&&cur[0]===id&&cur[1]==="p"&&slots(cur).includes(i)))});
+  $$(".b",el).forEach((b,i)=>{const v=t.bn[i]||"idle",on=v!=="idle";b.classList.toggle("act",!!(cur&&cur[0]===id&&cur[1]==="b"&&slots(cur).includes(i)));
+   if(pv.bn[i]!==v){$(".hp",b).src=on?ban(v):"";b.classList.remove("on","fresh");void b.offsetWidth;if(on){b.classList.add("on");if(pv.ok){b.classList.add("fresh");sb=1}}}});
+  pv.ok=1;prev[id]={pk:t.pk.map(x=>x||"idle"),bn:t.bn.map(x=>x||"idle"),ok:1};
+  const l=$("#l"+id),old=l.dataset.k,key=t.logo+"|"+t.sc+"|"+S.max;
+  if(old!==key){const was=+(l.dataset.sc||0);l.dataset.k=key;l.dataset.sc=t.sc;l.innerHTML=(t.logo?`<img src="${t.logo}">`:"")+'<div class="pp">'+Array.from({length:S.max},(_,i)=>`<i class="${i<t.sc?"on":""}" ${i<t.sc&&i>=was?"":'style="animation:none"'}></i>`).join("")+"</div>"}}
+ sp&&sfx.pick();sb&&sfx.ban();$("#sc").textContent=S.A.sc+" : "+S.B.sc;$("#ta").classList.toggle("on",!!cur&&cur[0]==="A");$("#tb").classList.toggle("on",!!cur&&cur[0]==="B");tick()}
+function tick(){const T=S.timer,l=T.run?Math.max(0,Math.ceil((T.end-Date.now())/1000)):T.left,e=$("#tm");if(!e)return;e.textContent=Math.floor(l/60)+":"+String(l%60).padStart(2,"0");e.classList.toggle("low",T.run&&l<=5);
+ if(T.run&&l<=5){if(l!==lastBeep){lastBeep=l;l>0?sfx.warn():sfx.end()}}else lastBeep=-1}
+function save(){localStorage.setItem(KEY,JSON.stringify(S));ch&&ch.postMessage(S)}
+function setp(k,v){const p=k.split(".");let o=S;for(let i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v}
+let mode=new URLSearchParams(location.search).get("control")==="free"?"free":"flow";
+const val=v=>idl(v)?"":v,dur=c=>c&&c[1]==="p"?S.timer.pd:S.timer.bd;
+function nextTimer(){const T=S.timer,c=curStep();if(c){T.left=dur(c);T.end=Date.now()+T.left*1000;T.run=true}else{T.left=0;T.run=false}}
+const DL='<datalist id="hl">'+HEROES.map(h=>`<option value="${h.n}">`).join("")+"</datalist>";
+const tmrUI=()=>`<fieldset><legend>Timer</legend><span id="ct" class="big"></span><br>Ban (detik): <input type="number" min="1" data-k="timer.bd" data-n="1" value="${S.timer.bd}" style="width:70px"> Pick (detik): <input type="number" min="1" data-k="timer.pd" data-n="1" value="${S.timer.pd}" style="width:70px"><br><button data-t="start">Start</button><button data-t="stop">Stop</button><button data-t="reset">Reset</button><br><label><input type="checkbox" data-k="auto" ${S.auto?"checked":""} style="width:auto"> Timer otomatis reset &amp; jalan tiap OK</label><br><label><input type="checkbox" data-k="snd.on" ${S.snd.on?"checked":""} style="width:auto"> Suara</label> Volume <input type="range" min="0" max="1" step=".05" data-k="snd.vol" value="${S.snd.vol}" style="width:120px"><br><button data-snd="pick">Tes Pick</button><button data-snd="ban">Tes Ban</button><button data-snd="warn">Tes Waktu</button></fieldset>`;
+const scUI=id=>`${id==="A"?"Biru":"Merah"} <button data-s="${id}" data-d="-1">−</button><b>${S[id].sc}</b><button data-s="${id}" data-d="1">+</button>`;
+const teamUI=id=>{const t=S[id];return`<fieldset><legend>${id==="A"?"Tim Kiri (Biru)":"Tim Kanan (Merah)"}</legend>
+ <input data-k="${id}.n" value="${t.n}" placeholder="Nama tim"><input data-k="${id}.sub" value="${t.sub}" placeholder="Subjudul / coach (opsional)"><input data-k="${id}.logo" value="${t.logo}" placeholder="Logo tim (URL/path)"><input data-k="${id}.ava" value="${t.ava}" placeholder="Foto coach (URL/path, opsional)">
+ <div>Warna tim: <input type="color" data-k="${id}.col" value="${t.col}" style="width:70px;height:34px;padding:0"></div>
+ <div class="g"><b></b><b>IGN</b><b>Pick</b><b>Ban</b>`+[0,1,2,3,4].map(i=>`<b>#${i+1}</b><input data-k="${id}.pl.${i}" value="${t.pl[i]}"><input list="hl" data-k="${id}.pk.${i}" value="${val(t.pk[i])}"><input list="hl" data-k="${id}.bn.${i}" value="${val(t.bn[i])}">`).join("")+`</div><div class="sc">Skor ${scUI(id)}</div></fieldset>`};
+const rstUI=()=>`<fieldset style="margin-bottom:8px"><legend>Reset Sebagian (tanpa reset semua)</legend>
+ <b>Kiri (Biru):</b> <button class="r" data-r="A.bn">Ban</button><button class="r" data-r="A.pk">Pick</button><button class="r" data-r="A.all">Ban + Pick</button><br>
+ <b>Kanan (Merah):</b> <button class="r" data-r="B.bn">Ban</button><button class="r" data-r="B.pk">Pick</button><button class="r" data-r="B.all">Ban + Pick</button><br>
+ <b>Kedua sisi:</b> <button class="r" data-r="X.bn">Semua Ban</button><button class="r" data-r="X.pk">Semua Pick</button><button class="r" data-r="X.all">Seluruh Draft</button></fieldset>`;
+function ctrl(){
+ const tabs=`<div class="tabs"><button data-m="flow" class="${mode==="flow"?"on":""}">Mode Alur (per urutan)</button><button data-m="free" class="${mode==="free"?"on":""}">Mode Bebas (edit penuh)</button></div>`;let body;
+ if(mode==="flow"){const c=curStep();
+  const chips=ORDER.map((o,n)=>{const sl=slots(o),a=S[o[0]][fld(o[1])];return`<div class="st ${o[0]} ${c===o?"cur":""} ${sl.every(i=>!idl(a[i]))?"done":""}"><small>${n+1}. ${o[0]==="A"?"Biru":"Merah"} ${o[1]==="b"?"Ban":"Pick"} ${sl.map(i=>i+1).join("+")}</small><b>${sl.map(i=>val(a[i])||"–").join(" + ")}</b></div>`}).join("");
+  const inputs=c?slots(c).map(i=>`<input class="fh" list="hl" value="${val(S[c[0]][fld(c[1])][i])}" placeholder="${c[1]==="b"?"Ban":"Pick"} ${i+1} – ketik/pilih hero" style="margin-bottom:4px">`).join(""):"";
+  body=`<fieldset><legend>Langkah Sekarang</legend><div class="big">${stepTxt()}</div>${inputs}<button id="ok" ${c?"":"disabled"}>OK</button><button id="undo" class="r">Undo</button></fieldset>
+  <div class="row2">${tmrUI()}<fieldset><legend>Skor</legend><div class="sc">${scUI("A")}</div><div class="sc">${scUI("B")}</div></fieldset></div><div class="chips">${chips}</div>`}
+ else body=`<input data-k="tour" value="${S.tour}" placeholder="Nama turnamen"><input data-k="stage" value="${S.stage}" placeholder="Babak / Game"><input data-k="mid" value="${S.mid}" placeholder="Logo turnamen (path)">
+ <div class="row2"><fieldset><legend>Skor</legend>Jumlah kotak skor (maks. menang): <input type="number" min="1" max="20" data-k="max" data-n="1" value="${S.max}" style="width:80px"><br>Durasi animasi pick (detik): <input type="number" min="1" max="6" step=".1" data-k="anim" data-n="1" value="${S.anim}" style="width:80px"><br><label><input type="checkbox" data-k="live" ${S.live?"checked":""} style="width:auto"> Animasi hidup setelah hero di-pick</label></fieldset>${tmrUI()}<fieldset><legend>Background</legend><select data-k="bg.t" style="padding:5px;width:100%"><option value="none" ${S.bg.t==="none"?"selected":""}>Transparan (untuk OBS)</option><option value="color" ${S.bg.t==="color"?"selected":""}>Warna solid</option><option value="image" ${S.bg.t==="image"?"selected":""}>Gambar</option></select>Warna: <input type="color" data-k="bg.c" value="${S.bg.c}" style="width:70px;height:34px;padding:0"><input data-k="bg.img" value="${S.bg.img}" placeholder="Gambar (path/URL, mis. bg.jpg)"></fieldset></div>
+ <div class="row2">${teamUI("A")+teamUI("B")}</div><button id="sw">Tukar Sisi</button><button class="r" id="rs">Reset Semua</button><p style="margin-top:10px;color:#9ab">Mode bebas: semua slot bisa diisi/dikosongkan kapan saja (kosongkan kolom untuk menghapus hero).</p>`;
+ $("#cf").innerHTML=DL+tabs+rstUI()+body;ctTick();const f=$(".fh");f&&f.focus()}
+function ctTick(){const e=$("#ct");if(!e)return;const T=S.timer,l=T.run?Math.max(0,Math.ceil((T.end-Date.now())/1000)):T.left;e.textContent="⏱ "+Math.floor(l/60)+":"+String(l%60).padStart(2,"0")}
+function okStep(){const c=curStep();if(!c)return;const fs=[...$$(".fh")],vs=fs.map(f=>f.value.trim().toLowerCase()),bad=vs.findIndex(v=>!v||!HM[v]);
+ if(bad>=0){alert(vs[bad]?"Hero '"+vs[bad]+"' tidak ada di daftar":"Pilih hero dulu");fs[bad].focus();return}
+ slots(c).forEach((i,j)=>S[c[0]][fld(c[1])][i]=vs[j]);if(S.auto)nextTimer();save();ctrl()}
+if(ctl){document.body.classList.add("ctl");ctrl();setInterval(ctTick,300);
+ document.addEventListener("change",e=>{const k=e.target.dataset.k;if(!k)return;let v=e.target.value.trim();if(e.target.type==="checkbox")v=e.target.checked;if(e.target.type==="range")v=+v;
+  if(/\.(pk|bn)\./.test(k)){v=v.toLowerCase();if(v&&!HM[v]){alert("Hero '"+v+"' tidak ada di daftar");e.target.value="";v=""}}
+  if(e.target.dataset.n)v=Math.max(1,Math.min(k==="max"?20:999,+v||1));
+  setp(k,v);if(/timer\.(bd|pd)/.test(k)&&!S.timer.run)S.timer.left=dur(curStep());save();if(k==="max")ctrl()});
+ document.addEventListener("input",e=>{if(e.target.type==="color"){setp(e.target.dataset.k,e.target.value);save()}});
+ document.addEventListener("keydown",e=>{if(e.target.classList.contains("fh")&&e.key==="Enter"){const a=[...$$(".fh")],n=a.indexOf(e.target);n<a.length-1?a[n+1].focus():okStep()}});
+ document.addEventListener("click",e=>{const t=e.target,d=t.dataset;
+  if(d.r){const[w,k]=d.r.split("."),ids=w==="X"?["A","B"]:[w];
+   if(!confirm("Reset "+(w==="A"?"kiri":w==="B"?"kanan":"kedua sisi")+": "+t.textContent+"?"))return;
+   ids.forEach(id=>{if(k!=="pk")S[id].bn=Array(5).fill("");if(k!=="bn")S[id].pk=Array(5).fill("")});S.timer.run=false;S.timer.left=dur(curStep());save();ctrl()}
+  if(d.snd){ac();sfx[d.snd]()}if(d.m){mode=d.m;ctrl()}if(t.id==="ok")okStep();
+  if(t.id==="undo"){const c=[...ORDER].reverse().find(o=>slots(o).some(i=>!idl(S[o[0]][fld(o[1])][i])));if(c){slots(c).forEach(i=>S[c[0]][fld(c[1])][i]="");S.timer.run=false;S.timer.left=dur(c);save();ctrl()}}
+  if(d.s){S[d.s].sc=Math.max(0,S[d.s].sc+ +d.d);save();ctrl()}
+  if(d.t){const T=S.timer;if(d.t==="start"){if(!T.left)T.left=dur(curStep());T.end=Date.now()+T.left*1000;T.run=true}else if(d.t==="stop"){if(T.run)T.left=Math.max(0,Math.ceil((T.end-Date.now())/1000));T.run=false}else{T.left=dur(curStep());T.run=false}save()}
+  if(t.id==="sw"){[S.A,S.B]=[S.B,S.A];save();ctrl()}if(t.id==="rs"&&confirm("Reset semua data?")){S=def();save();ctrl()}})}
+else{["A","B"].forEach(build);ac();render();document.fonts&&document.fonts.ready.then(fitTxt);setInterval(tick,200);
+ ch&&(ch.onmessage=e=>{S=e.data;render()});addEventListener("storage",e=>{if(e.key===KEY){S=JSON.parse(e.newValue);render()}})}
+</script></body></html>

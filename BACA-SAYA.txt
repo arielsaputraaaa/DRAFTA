@@ -1,0 +1,11 @@
+DRAFT PICK MLBB (HTML/JS)
+
+1. Buka folder ini di VS Code, klik kanan index.html -> Open with Live Server.
+2. Overlay : http://127.0.0.1:5500/index.html
+   Kontrol : http://127.0.0.1:5500/index.html?control        (Mode Alur)
+             http://127.0.0.1:5500/index.html?control=free   (Mode Bebas)
+   (Port 5500 bisa berbeda; pakai kedua tab di browser yang sama.)
+3. OBS: Browser Source 1920x1080 untuk overlay, kontrol lewat Custom Browser Dock.
+4. Logo turnamen: ganti file logo.png (placeholder) dengan logo Anda.
+5. Suara sendiri (opsional): taruh pick.mp3, ban.mp3, warn.mp3, end.mp3 di folder sound/.
+6. Gambar baru: HeroPick/<nama>.png dan HeroBan/<nama>.png (nama huruf kecil).
