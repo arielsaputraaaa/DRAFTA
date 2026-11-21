@@ -12,11 +12,11 @@ fieldset{border:1px solid var(--bd);background:var(--pn);margin:0 0 14px;padding
 input,select{width:100%;padding:7px;margin-top:3px;background:#0b1020;color:#fff;border:1px solid #fff3}input[type=checkbox]{width:auto;margin:0}input[type=color]{height:34px;padding:2px}
 .ds{grid-column:1/-1;font-size:12px;color:#f2c94c;background:#0006;padding:6px 8px;border-left:3px solid var(--ac)}iframe#dr,iframe#lbf{width:100%;height:calc(100vh - 70px);border:0;background:#161820}
 .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.hint{font-size:12px;color:#9fb0cf;margin-top:6px}
-.scb{display:flex;gap:8px}.scb button{flex:1;padding:14px 6px;font:700 18px Oswald;letter-spacing:2px;text-transform:uppercase}.scb button.on{box-shadow:0 0 0 3px #0008,0 0 18px var(--ac)}iframe#lbf{height:calc(100vh - 190px)}</style></head><body>
+.scb{display:flex;gap:8px}.scb button{flex:1;padding:14px 6px;font:700 18px Oswald;letter-spacing:2px;text-transform:uppercase}.scb button.on{box-shadow:0 0 0 3px #0008,0 0 18px var(--ac)}iframe#lbf{height:calc(100vh - 60px);min-height:560px}</style></head><body>
 <header><h1>Panel Kontrol — Draft + Panggung</h1><button data-v="st" class="on">Panggung (Atas)</button><button data-v="dr">Draft Pick (Bawah)</button><button data-v="lb">Lobby Esports</button><a class="btn pri" href="live.html" target="_blank">Buka Output Live ↗</a></header>
 <main><div id="L"></div><div id="R"><fieldset id="scf"><legend>Pindah Scene</legend><div id="scn"></div></fieldset><div id="pv"><iframe id="ov" src="live.html?lite" allow="display-capture"></iframe></div><p class="hint">Preview ringan (animasi berulang dimatikan supaya panel tidak lag). Untuk OBS pakai Browser Source ke <b>live.html</b>.</p></div></main>
 <script src="common.js"></script><script>
-let S=loadS(),V='st';const $=(s,e=document)=>e.querySelector(s),sv=()=>saveS(S);
+let S=loadS(),V='st';const $=(s,e=document)=>e.querySelector(s),sv=()=>{saveS(S);localStorage.lobby_clk=JSON.stringify(S.lk);typeof LC!='undefined'&&LC.postMessage({t:'clk',o:S.lk})};
 const g=p=>p.split('.').reduce((o,k)=>o[k],S),sp=(p,v)=>{const a=p.split('.');let o=S;a.slice(0,-1).forEach(k=>o=o[k]);o[a.pop()]=v};
 const q=v=>String(v).replace(/"/g,'&quot;');
 const inp=(p,l,t='text',x='')=>`<label>${l}<input type="${t}" data-k="${p}" value="${q(g(p))}" ${x}></label>`;
@@ -39,23 +39,23 @@ function stUI(){const ids=[...Array(+S.nl).keys(),...[...Array(+S.nr).keys()].ma
 <fieldset><legend>Background</legend><div class="gr">${sel('bg.t','Jenis',{none:'Transparan (untuk OBS)',color:'Warna solid',anim:'Animasi',media:'Upload gambar / video'})}${S.bg.t=='anim'?sel('bg.an','Animasi',{aurora:'Aurora bergerak',gradient:'Gradasi bergeser',pulse:'Berdenyut',grid:'Grid berjalan'}):''}${S.bg.t=='media'?`<label>Upload background<input type="file" accept="image/*,video/*" data-bgup="1"></label>`:''}${inp('bg.c1','Warna 1','color')}${S.bg.t=='anim'?inp('bg.c2','Warna 2','color'):''}</div></fieldset>
 <fieldset><legend>Warna Bingkai</legend><div class="gr">${inp('th.ac','Aksen / bar komentar','color')}${inp('th.bd','Garis bingkai','color')}${inp('th.pn','Panel gelap','color')}</div><div class="row"><button data-th='{"ac":"#f5c06f","bd":"#d4ab4c","pn":"#111827"}'>Preset Emas–Navy (referensi)</button><button data-th='{"ac":"#ff3b3b","bd":"#e32b2b","pn":"#1a0d10"}'>Preset Merah</button></div></fieldset>`}
 const LC=new BroadcastChannel('lobby3');
-const lbUI=()=>`<fieldset><legend>Timer Lobby (tampil di scene Lobby)</legend><div class="row"><button class="pri" data-lc="start">▶ Mulai</button><button data-lc="pause">⏸ Jeda</button><button data-lc="reset">⟲ Reset</button></div><p class="hint">Editor lengkap di bawah (tab Timer, Panelis, Media, Teks). Semua perubahan langsung tampil di preview dan di output live.</p></fieldset><iframe id="lbf" src="lobby.html?edit"></iframe>`;
+const lbUI=()=>`<fieldset><legend>Timer Lobby (tampil di scene Lobby)</legend><div class="row"><button class="pri" data-lc="start">▶ Mulai</button><button data-lc="pause">⏸ Jeda</button><button data-lc="reset">⟲ Reset</button></div><p class="hint">Editor lengkap di bawah (tab Timer, Panelis, Media, Teks). Semua perubahan langsung tampil di preview dan di output live.</p></fieldset><fieldset><legend>Posisi &amp; Ukuran Timer / Stopwatch Lobby</legend><div class="gr">${sel('lk.al','Rata timer',{start:'Kiri',center:'Tengah',end:'Kanan'})}${inp('lk.x','Geser kanan (+) / kiri (−), px','number','step=10')}${inp('lk.y','Geser turun (+) / naik (−), px','number','step=10')}${inp('lk.s','Ukuran (%)','number','min=30 max=300 step=5')}</div><div class="row"><button data-lkp='{"al":"start","x":0,"y":0,"s":100}'>Posisi asli</button><button data-lkp='{"al":"start","x":0,"y":60,"s":100}'>Turun sedikit</button><button data-lkp='{"al":"start","x":0,"y":140,"s":100}'>Turun banyak</button><button data-lkp='{"al":"center","x":0,"y":100,"s":110}'>Tengah</button></div></fieldset><iframe id="lbf" src="lobby.html?edit"></iframe>`;
 function scDraw(){const c=S.sc,L=c.cur=='lobby';$('#scn').innerHTML=`<div class="scb"><button data-go="lobby" class="${L?'on pri':''}">Lobby${L?' ● LIVE':''}</button><button data-go="draft" class="${L?'':'on pri'}">Draft${L?'':' ● LIVE'}</button></div><div class="gr" style="margin-top:8px">${sel('sc.tr','Animasi perpindahan',{fade:'Fade',slidel:'Geser ke kiri',slider:'Geser ke kanan',slideu:'Geser ke atas',zoom:'Zoom',wipe:'Wipe'})}${inp('sc.dur','Durasi (ms)','number','min=200 step=100')}</div>`}
 function draw(){document.querySelectorAll('header [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v==V));
  $('#L').innerHTML=V=='st'?stUI():V=='lb'?lbUI():'<iframe id="dr" src="index.html?control"></iframe>';scDraw()}
 addEventListener('change',async e=>{const t=e.target,d=t.dataset;
  if(d.up!==undefined&&t.files[0]){const f=t.files[0],k='f'+Date.now(),b=S.boxes[d.up];await put(k,f);b.key=k;b.type=f.type.startsWith('video')?'video':'img';sv();return draw()}
  if(d.bgup&&t.files[0]){const f=t.files[0],k='bg'+Date.now();await put(k,f);S.bg.key=k;S.bg.mt=f.type.startsWith('video')?'video':'img';sv();return draw()}
- if(!d.k)return;let v=t.type=='checkbox'?t.checked:t.type=='number'?Math.max(/^ar\./.test(d.k)?0:1,+t.value||(/^ar\./.test(d.k)?0:1)):t.value;if(/^n[lr]$/.test(d.k))v=+t.value;sp(d.k,v);
+ if(!d.k)return;let v=t.type=='checkbox'?t.checked:t.type=='number'?Math.max(/^ar\./.test(d.k)?0:1,+t.value||(/^ar\./.test(d.k)?0:1)):t.value;if(/^n[lr]$/.test(d.k))v=+t.value;if(/^lk\./.test(d.k))v=d.k=='lk.al'?t.value:+t.value;sp(d.k,v);
  if(d.k=='tm.mode'){S.tm.left=v=='up'?0:S.tm.dur;S.tm.run=false}if(d.k=='tm.dur'&&!S.tm.run)S.tm.left=v;sv();if(/\.type$|^n[lr]$|\.anim$|^bg\.t$|^tm\.mode$/.test(d.k))draw()});
 addEventListener('input',e=>{const d=e.target.dataset;if(d.k&&/text|color/.test(e.target.type)){sp(d.k,e.target.value);sv()}});
 addEventListener('click',e=>{const t=e.target,d=t.dataset,T=S.tm;
- if(d.v){V=d.v;draw()}if(d.go){S.sc.cur=d.go;sv();scDraw()}if(d.lc)LC.postMessage({t:'cmd',c:d.lc});if(d.cap!==undefined)$('#ov').contentWindow.cap(+d.cap);if(d.rp){S.rp=Date.now();sv()}
+ if(d.v){V=d.v;draw()}if(d.lkp){Object.assign(S.lk,JSON.parse(d.lkp));sv();draw()}if(d.go){S.sc.cur=d.go;sv();scDraw()}if(d.lc)LC.postMessage({t:'cmd',c:d.lc});if(d.cap!==undefined)$('#ov').contentWindow.cap(+d.cap);if(d.rp){S.rp=Date.now();sv()}
  if(d.th){Object.assign(S.th,JSON.parse(d.th));sv();draw()}
  if(d.d){T.dur=+d.d;if(!T.run)T.left=T.dur;sv();draw()}
  if(d.t){const up=T.mode=='up',now=Date.now();
   if(d.t=='start'){if(!T.run){if(up)T.st=now;else{if(!T.left)T.left=T.dur;T.end=now+T.left*1000}T.run=true}}
   else if(d.t=='stop'){if(T.run)T.left=up?T.left+(now-T.st)/1000:Math.max(0,Math.ceil((T.end-now)/1000));T.run=false}
   else{T.left=up?0:T.dur;T.run=false}sv()}});
-draw();ch&&(ch.onmessage=e=>{S=e.data;V=='st'&&draw()});
+localStorage.lobby_clk=JSON.stringify(S.lk);draw();ch&&(ch.onmessage=e=>{S=e.data;V=='st'&&draw()});
 </script></body></html>

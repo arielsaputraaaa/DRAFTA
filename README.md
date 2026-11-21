@@ -41,3 +41,7 @@ Tab Panggung → **Ukuran & Posisi Kotak**: margin kiri/kanan/atas, jarak ke bar
 
 ## Performa
 Preview di panel memakai mode ringan (`live.html?lite`: animasi berulang dimatikan). Output OBS (`live.html`) tetap penuh. Gambar hero dimuat lebih awal di latar belakang dan didekode sebelum ditampilkan supaya pick tidak freeze.
+
+## Upload logo & posisi timer lobby
+- Draft Pick (Mode Bebas): logo tim, foto coach, logo turnamen, dan gambar background sekarang **upload file** (otomatis dikecilkan, tersimpan di browser).
+- Tab Lobby Esports: **Posisi & Ukuran Timer / Stopwatch Lobby** (rata kiri/tengah/kanan, geser X/Y, ukuran).

@@ -1524,6 +1524,8 @@
 (()=>{const P=new URLSearchParams(location.search),ED=P.has('edit'),VW=P.has('view');if(!ED&&!VW)return;
 const C=new BroadcastChannel('lobby3'),O={start:startClock,pause:pauseClock,reset:resetClock};
 document.getElementById('hk-css').textContent='#secret-settings-hotspot{display:none!important}'+(VW?'#editor-drawer{display:none!important}body{overflow:hidden}':'#editor-drawer{transform:none!important}');
+const ck=o=>{const e=document.getElementById('clock-display');if(!e||!o)return;const pa=e.parentElement;pa.style.alignItems={start:'flex-start',center:'center',end:'flex-end'}[o.al]||'';e.style.position='relative';e.style.left=(o.x||0)+'px';e.style.top=(o.y||0)+'px';e.style.zoom=(o.s||100)/100;e.style.transformOrigin='left top'};
+try{ck(JSON.parse(localStorage.lobby_clk))}catch(e){}
 const db=()=>new Promise(r=>{const q=indexedDB.open('stg',1);q.onupgradeneeded=()=>q.result.createObjectStore('f');q.onsuccess=()=>r(q.result)});
 const idbPut=async v=>{const d=await db();d.transaction('f','readwrite').objectStore('f').put(v,'lobby')};
 const idbGet=async()=>{const d=await db();return new Promise(r=>{const q=d.transaction('f').objectStore('f').get('lobby');q.onsuccess=()=>r(q.result)})};
@@ -1533,11 +1535,11 @@ if(ED){
  let last='',busy=0;async function push(){if(busy)return;busy=1;try{const p=buildVisualPreset();for(let i=0;i<p.banners.length;i++)p.banners[i].src=await du(bannersData[i].src)||p.banners[i].src;
   const s=JSON.stringify(p);if(s!==last){last=s;C.postMessage({t:'preset',p});idbPut(p)}}catch(e){console.error(e)}busy=0}
  let tm;['input','change','click'].forEach(e=>document.addEventListener(e,()=>{clearTimeout(tm);tm=setTimeout(push,400)},true));setInterval(push,2000);
- C.onmessage=e=>{const d=e.data;if(d.t=='cmd')O[d.c]()};
+ C.onmessage=e=>{const d=e.data;if(d.t=='cmd')O[d.c]();else if(d.t=='clk')ck(d.o)};
  setTimeout(async()=>{const p=await idbGet();if(p){applyPresetObject(p)}push()},400);
 }else{
  let lk='';const ap=p=>{const k=JSON.stringify([p.clock.mode,p.clock.minutes,p.clock.seconds]),run=isRunning,cs=currentSeconds;applyPresetObject(p);if(k===lk){currentSeconds=cs;renderClock();run&&startClock()}lk=k};
- C.onmessage=e=>{const d=e.data;if(d.t=='preset')ap(d.p);else if(d.t=='cmd')O[d.c]()};
+ C.onmessage=e=>{const d=e.data;if(d.t=='preset')ap(d.p);else if(d.t=='cmd')O[d.c]();else if(d.t=='clk')ck(d.o)};
  setTimeout(async()=>{const p=await idbGet();if(p)ap(p)},400);
 }})();
 </script>
